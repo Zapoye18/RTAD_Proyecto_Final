@@ -35,5 +35,10 @@ jobs:
               git clone https://github.com/Zapoye18/RTAD_Proyecto_Final /home/${{ secrets.SERVER_USER }}/refugio
             fi
 
-            cd /home/${{ secrets.SERVER_USER }}/refugio
+            cd /home/${{ secrets.SERVER_USER }}/refugio/RDAT/frontend
+
+            pkill -f "python3 -m http.server" || true
+
             git pull origin main
+
+            nohup python3 -m http.server 8000 > server.log 2>&1 &
