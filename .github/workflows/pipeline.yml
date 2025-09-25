@@ -38,6 +38,8 @@ jobs:
             cd /home/${{ secrets.SERVER_USER }}/refugio/RDAT/frontend
 
             git pull origin main
-            
-            python3 -m http.server 8000
+
+            sudo kill -9 35972
+            nohup python3 -m http.server 8000 > server.log 2>&1 &
+            disown
 
