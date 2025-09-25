@@ -1,0 +1,39 @@
+name: CI/CD Refugio Animales (EC2)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Descargar el código 
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      # Aquí podrías agregar pasos de build local si quisieras validar algo
+      - name: Mostrar archivos
+        run: ls -lah
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy a servidor remoto 
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # Si no existe el directorio, clonar el repo
+            if [ ! -d "/home/${{ secrets.SERVER_USER }}/refugio" ]; then
+              git clone https://github.com/Zapoye18/RTAD_Proyecto_Final /home/${{ secrets.SERVER_USER }}/refugio
+            fi
+
+            cd /home/${{ secrets.SERVER_USER }}/refugio
+            git pull origin main
