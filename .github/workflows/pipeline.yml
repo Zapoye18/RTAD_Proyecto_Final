@@ -43,8 +43,8 @@ jobs:
 
             #Traer últimos cambios de la rama
             git fetch origin
-            git checkout Testing || git checkout -b Testing
-            git pull origin Testing
+            git checkout Pruebas || git checkout -b Pruebas
+            git pull origin Pruebas
 
             # secretos en .env
             # cat > .env << 'EOF'
