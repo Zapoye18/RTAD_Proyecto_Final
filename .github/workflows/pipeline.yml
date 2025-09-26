@@ -21,77 +21,32 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            set -euo pipefail
+            set -e
 
-            # Detectar Amazon Linux 2 
-            source /etc/os-release
-            AMZN_VERSION="${VERSION_ID:-}"
-
-            echo "ID=$ID VERSION_ID=$AMZN_VERSION"
-
-            # Instala Docker en Amazon Linux 
-            if ! command -v docker >/dev/null 2>&1; then
-              echo "Instalando Docker para Amazon Linux..."
-              if [[ "$ID" = "amzn" && "$AMZN_VERSION" =~ ^2 ]]; then
-                # Amazon Linux 2
-                sudo yum update -y
-                sudo amazon-linux-extras enable docker
-                sudo yum install -y docker
-                sudo systemctl enable docker
-                sudo systemctl start docker
-              else
-                # Amazon Linux 2023 (al2023)
-                sudo dnf update -y || true
-                sudo dnf install -y docker
-                sudo systemctl enable --now docker
-              fi
-            fi
-
-            # Agregar usuario al grupo docker (no tendrá efecto inmediato)
-            sudo usermod -aG docker "$USER" || true
-
-            # 1) Instala Docker Compose 
-            if ! docker compose version >/dev/null 2>&1; then
-              echo "Instalando Docker Compose v2..."
-              DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-              mkdir -p "$DOCKER_CONFIG/cli-plugins"
-              ARCH="$(uname -m)"
-              # Normaliza nombres de arquitectura
-              case "$ARCH" in
-                x86_64) ARCH_DL=linux-x86_64 ;;
-                aarch64|arm64) ARCH_DL=linux-aarch64 ;;
-                *) ARCH_DL="linux-x86_64" ;;
-              esac
-              curl -SL "https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-${ARCH_DL}" \
-                -o "$DOCKER_CONFIG/cli-plugins/docker-compose"
-              chmod +x "$DOCKER_CONFIG/cli-plugins/docker-compose"
-              # Asegura que docker vea el plugin
-              echo "PATH=$PATH"
-              docker compose version
-            fi
-
-            # 2) Obtenemos el código del repo
+            # Clonar si no existe
             if [ ! -d "/home/${{ secrets.SERVER_USER }}/refugio" ]; then
-              git clone https://github.com/Zapoye18/RTAD_Proyecto_Final "/home/${{ secrets.SERVER_USER }}/refugio"
+              git clone https://github.com/Zapoye18/RTAD_Proyecto_Final /home/${{ secrets.SERVER_USER }}/refugio
             fi
-            cd "/home/${{ secrets.SERVER_USER }}/refugio"
+            cd /home/${{ secrets.SERVER_USER }}/refugio
 
+            #Traer últimos cambios de la rama
             git fetch origin
             git checkout Testing || git checkout -b Testing
             git pull origin Testing
 
-            # 3) Opcional .env desde Secrets 
+            # secretos en .env
             # cat > .env << 'EOF'
-            # PORT_BACKEND=5000
             # JWT_SECRET=${{ secrets.JWT_SECRET }}
             # DB_URI=${{ secrets.DB_URI }}
             # EOF
 
-            # 4) Build & Up 
-            sudo docker compose down || true
-            sudo docker compose build --pull
-            sudo docker compose up -d --remove-orphans
+            #Build & Up
+            docker compose down
+            docker compose build --pull
+            docker compose up -d --remove-orphans
 
-            # 5) Limpieza de imágenes sobrantes 
-            sudo docker image prune -f
+            #Limpieza de imágenes colgantes
+            docker image prune -f
+
+            echo "Despliegue OK"
 
