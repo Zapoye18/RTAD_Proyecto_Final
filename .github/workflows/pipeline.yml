@@ -1,46 +1,62 @@
-name: CI/CD Refugio Animales (EC2)
+name: CI/CD Refugio Animales (EC2, build on server)
 
 on:
   push:
     branches:
       - Testing
 
+concurrency:
+  group: cicd-refugio-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      # 1. Descargar el código 
-      - name: Checkout código
-        uses: actions/checkout@v3
-
-      # Aquí podrías agregar pasos de build local si quisieras validar algo
-      - name: Mostrar archivos
-        run: ls -lah
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/Testing'
 
     steps:
-      - name: Deploy a servidor remoto 
+      - name: Desplegar en EC2 (build + up)
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # Si no existe el directorio, clonar el repo
+            set -e
+
+            if ! command -v docker >/dev/null 2>&1; then
+              echo "Instalando Docker..."
+              curl -fsSL https://get.docker.com | sh
+              sudo usermod -aG docker $USER || true
+            fi
+            if ! docker compose version >/dev/null 2>&1; then
+              echo "Instalando Docker Compose v2..."
+              DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+              mkdir -p $DOCKER_CONFIG/cli-plugins
+              curl -SL https://github.com/docker/compose/releases/download/v2.29.7/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+              chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+            fi
+
             if [ ! -d "/home/${{ secrets.SERVER_USER }}/refugio" ]; then
               git clone https://github.com/Zapoye18/RTAD_Proyecto_Final /home/${{ secrets.SERVER_USER }}/refugio
             fi
+            cd /home/${{ secrets.SERVER_USER }}/refugio
 
-            cd /home/${{ secrets.SERVER_USER }}/refugio/RDAT/frontend
+            git fetch origin
+            git checkout Testing || git checkout -b Testing
+            git pull origin Testing
 
-            git pull origin main
+            # 3) (Opcional) .env del servidor
+            # Crea/actualiza .env si mandas secretos desde Actions:
+            # cat > .env << 'EOF'
+            # DB_URI=${{ secrets.DB_URI }}
+            # JWT_SECRET=${{ secrets.JWT_SECRET }}
+            # EOF
 
-            sudo kill -9 35972
-            nohup python3 -m http.server 8000 > server.log 2>&1 &
-            disown
-            #Prueba de nuevo por si acaso
+            docker compose down
+            # Usa cache normalmente; elimina --no-cache si quieres builds más rápidos
+            docker compose build --pull
+            docker compose up -d --remove-orphans
+
+            docker image prune -f
+
 
