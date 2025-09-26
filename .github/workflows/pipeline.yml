@@ -33,7 +33,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            set -e
+            set -euxo pipefail
 
             # Clonar si no existe
             if [ ! -d "/home/${{ secrets.SERVER_USER }}/refugio" ]; then
@@ -41,10 +41,10 @@ jobs:
             fi
             cd /home/${{ secrets.SERVER_USER }}/refugio
 
-            #Traer últimos cambios de la rama
-            git fetch origin
-            git checkout Pruebas || git checkout -b Pruebas
-            git pull origin Pruebas
+            git fetch --all --prune
+            git checkout -B Pruebas origin/Pruebas   # crea/repone la rama local igualita a la remota
+            git reset --hard origin/Pruebas          # asegura HEAD/índice/working tree
+            git clean -xfd
 
             # secretos en .env
             # cat > .env << 'EOF'
