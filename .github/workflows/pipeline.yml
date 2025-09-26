@@ -3,7 +3,7 @@ name: CI/CD Refugio Animales (EC2, build on server)
 on:
   push:
     branches:
-      - Testing
+      - Pruebas
 
 concurrency:
   group: cicd-refugio-${{ github.ref }}
