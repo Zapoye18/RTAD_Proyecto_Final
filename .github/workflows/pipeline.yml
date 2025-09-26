@@ -10,7 +10,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Descargar el código 
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      # Aquí podrías agregar pasos de build local si quisieras validar algo
+      - name: Mostrar archivos
+        run: ls -lah
+
   deploy:
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
