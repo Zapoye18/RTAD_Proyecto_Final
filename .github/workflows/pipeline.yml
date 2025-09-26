@@ -45,8 +45,5 @@ jobs:
             docker compose build --pull
             docker compose up -d --remove-orphans
 
-            #Limpieza de imágenes colgantes
-            docker image prune -f
-
             echo "Despliegue OK"
 
