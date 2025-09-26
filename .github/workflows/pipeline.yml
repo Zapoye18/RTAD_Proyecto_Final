@@ -58,6 +58,8 @@ jobs:
             # DB_URI=${{ secrets.DB_URI }}
             # EOF
 
+            cd RDAT 
+
             #Build & Up
             docker compose down
             docker compose build --pull
