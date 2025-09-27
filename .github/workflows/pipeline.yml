@@ -72,4 +72,3 @@ jobs:
             docker logs refugio-frontend --tail=100 || true
 
             echo "Despliegue OK Definitivo"
-
