@@ -1,14 +1,25 @@
-const Employee = require("../models/employee.model");
+const fs = require('fs');
+const path = require('path');
 
 exports.login = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const employee = await Employee.findOne({ username });
-    if (!employee || employee.password !== password) {
-      return res.status(401).json({ mensaje: "Usuario o contraseña inválidos ❌" });
+    // Leer usuarios del JSON
+    const usuariosPath = path.join(__dirname, '../../usuarios.json');
+    const usuarios = JSON.parse(fs.readFileSync(usuariosPath, 'utf8'));
+    
+    // Buscar usuario
+    const usuario = usuarios.find(u => u.username === username && u.password === password);
+    
+    if (usuario) {
+      return res.json({ 
+        mensaje: `Bienvenido ${usuario.username} (${usuario.role}) `,
+        usuario: { id: usuario.id, username: usuario.username, role: usuario.role }
+      });
     }
-    res.json({ mensaje: "Bienvenido " + employee.username + " ✅" });
+    
+    return res.status(401).json({ mensaje: "Usuario o contraseña inválidos" });
   } catch (error) {
     res.status(500).json({ mensaje: "Error en el servidor" });
   }

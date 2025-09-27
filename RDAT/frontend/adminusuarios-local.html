@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Administrador de Usuarios (Local)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="admin-container">
+    <h2>Administrador de Usuarios</h2>
+    <div id="usuarios-list"></div>
+    <h3>Agregar Usuario</h3>
+    <form id="addUserForm">
+      <input type="text" id="newUsername" placeholder="Usuario" required>
+      <input type="password" id="newPassword" placeholder="Contraseña" required>
+      <select id="newRole" required>
+        <option value="">Rol</option>
+        <option value="administrador">Administrador</option>
+        <option value="empleado">Empleado</option>
+        <option value="veterinario">Veterinario</option>
+      </select>
+      <button type="submit">Agregar Usuario</button>
+    </form>
+    <p id="mensaje"></p>
+    <button onclick="descargarJSON()">Descargar usuarios.json</button>
+  </div>
+  <script>
+    let usuarios = [];
+
+    // Cargar usuarios del localStorage o JSON
+    async function cargarUsuarios() {
+      const stored = localStorage.getItem('usuarios');
+      if (stored) {
+        usuarios = JSON.parse(stored);
+      } else {
+        // Intentar cargar del JSON existente
+        try {
+          const response = await fetch('./usuarios.json');
+          usuarios = await response.json();
+          localStorage.setItem('usuarios', JSON.stringify(usuarios));
+        } catch (error) {
+          usuarios = [
+            { id: 1, username: "admin", password: "refugio123", role: "administrador" }
+          ];
+          guardarUsuarios();
+        }
+      }
+    }
+
+    // Guardar usuarios en localStorage
+    function guardarUsuarios() {
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+    }
+
+    // Renderizar lista de usuarios
+    function renderUsuarios() {
+      const list = document.getElementById('usuarios-list');
+      list.innerHTML = '<h3>Usuarios Registrados</h3>';
+      usuarios.forEach(u => {
+        list.innerHTML += `
+          <div style="margin-bottom:8px; padding:10px; border:1px solid #ddd; border-radius:5px;">
+            <strong>${u.username}</strong> (${u.role})
+            <button onclick="eliminarUsuario(${u.id})" style="margin-left:10px; background:#f44336; color:white; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">Eliminar</button>
+          </div>
+        `;
+      });
+    }
+
+    // Eliminar usuario
+    window.eliminarUsuario = function(id) {
+      if (confirm('¿Estás seguro de eliminar este usuario?')) {
+        usuarios = usuarios.filter(u => u.id !== id);
+        guardarUsuarios();
+        renderUsuarios();
+        document.getElementById('mensaje').textContent = 'Usuario eliminado correctamente.';
+      }
+    };
+
+    // Agregar usuario
+    document.getElementById('addUserForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('newUsername').value.trim();
+      const password = document.getElementById('newPassword').value.trim();
+      const role = document.getElementById('newRole').value;
+
+      if (!username || !password || !role) {
+        document.getElementById('mensaje').textContent = 'Completa todos los campos.';
+        return;
+      }
+
+      if (usuarios.some(u => u.username === username)) {
+        document.getElementById('mensaje').textContent = 'El usuario ya existe.';
+        return;
+      }
+
+      const newUser = {
+        id: usuarios.length ? Math.max(...usuarios.map(u => u.id)) + 1 : 1,
+        username,
+        password,
+        role
+      };
+
+      usuarios.push(newUser);
+      guardarUsuarios();
+      renderUsuarios();
+      document.getElementById('addUserForm').reset();
+      document.getElementById('mensaje').textContent = 'Usuario agregado correctamente.';
+    });
+
+    // Descargar JSON
+    window.descargarJSON = function() {
+      const dataStr = JSON.stringify(usuarios, null, 2);
+      const dataBlob = new Blob([dataStr], {type: 'application/json'});
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'usuarios.json';
+      link.click();
+      
+      document.getElementById('mensaje').textContent = '✅ JSON descargado. Reemplaza el archivo usuarios.json original con este.';
+    };
+
+    // Inicializar
+    cargarUsuarios().then(() => {
+      renderUsuarios();
+    });
+  </script>
+</body>
+</html>

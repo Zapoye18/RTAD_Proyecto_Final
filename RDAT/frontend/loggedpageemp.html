@@ -4,12 +4,64 @@
   <meta charset="UTF-8">
   <title>Refugio de Animales Tilin</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+    }
+    .emp_menu {
+      background: #fff;
+      padding: 30px;
+      margin: 50px auto;
+      width: 350px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .emp_menu h2 {
+      margin-bottom: 25px;
+      color: #333;
+    }
+    .emp_menu button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      font-size: 16px;
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .emp_menu button:hover {
+      background: #388e3c;
+    }
+  </style>
 </head>
 <body>
   <div class="emp_menu">
-    <h2>Menu de Empleados</h2>
-    
-  </div>
-  <script src="app.js"></script>
+  <h2>Menú de Empleados</h2>
+  <button onclick="location.href='animales.html'">Animales del Refugio</button>
+  <button onclick="location.href='inventario.html'">Inventario</button>
+  <button onclick="location.href='voluntarios.html'">Voluntarios</button>
+  <button onclick="location.href='donaciones.html'">Donaciones</button>
+  <div id="adminBtnContainer"></div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+  const usuario = JSON.parse(localStorage.getItem('usuarioLogueado'));
+  if (usuario && usuario.role === 'administrador') {
+    const btn = document.createElement('button');
+    btn.textContent = 'Administrador de Usuarios';
+    btn.onclick = function() {
+      location.href = 'adminusuarios-local.html';
+    };
+    document.getElementById('adminBtnContainer').appendChild(btn);
+  }
+});
+</script>
+<script src="app.js"></script>
 </body>
 </html>

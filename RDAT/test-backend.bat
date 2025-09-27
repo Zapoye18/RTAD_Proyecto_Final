@@ -1,0 +1,9 @@
+@echo off
+echo Probando backend...
+cd backend
+echo Instalando dependencias...
+npm install
+echo.
+echo Iniciando servidor...
+node server.js
+pause

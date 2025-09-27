@@ -1,17 +1,25 @@
-const express = require("express");
-const cors = require("cors");
-require("dotenv").config();
-const connectDB = require("./config/db");
-
+const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const cors = require('cors');
+const authRoutes = require('./routes/auth.routes');
 
 app.use(cors());
 app.use(express.json());
 
-// Rutas
-app.use("/api/auth", require("./routes/auth.routes"));
+// Debug middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`);
+  next();
+});
 
-// Iniciar
-connectDB();
-app.listen(PORT, () => console.log(`Servidor en http://localhost:${PORT}`));
+app.use('/api', authRoutes);
+
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Servidor backend en puerto ${PORT}`);
+  console.log('Rutas disponibles:');
+  console.log('POST /api/login');
+  console.log('GET /api/usuarios');
+  console.log('POST /api/usuarios');
+  console.log('DELETE /api/usuarios/:id');
+});
