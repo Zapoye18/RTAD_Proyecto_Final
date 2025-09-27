@@ -62,8 +62,8 @@ jobs:
 
             #Build & Up
             docker compose down
-            docker compose build --pull
-            docker compose up -d --remove-orphans
+            docker compose build --pull --no-cache
+            docker compose up -d --force-recreate --remove-orphans
 
             echo "Despliegue OK Definitivo"
 
