@@ -1,16 +1,20 @@
-# Etapa de dependencias
+# Etapa deps
 FROM node:18-alpine AS deps
 WORKDIR /RDAT/backend
 COPY backend/package*.json ./
-RUN npm ci --only=production
+
+# Herramientas de build para deps nativas (gyp)
+RUN apk add --no-cache --virtual .gyp python3 make g++ \
+ && npm ci --omit=dev --no-audit --no-fund --loglevel verbose \
+ && apk del .gyp
 
 # Etapa final
 FROM node:18-alpine
 WORKDIR /RDAT/backend
 COPY --from=deps /RDAT/backend/node_modules ./node_modules
-# Copia TODO el backend (controllers, models, routes, server.js y usuarios.json)
 COPY backend/ ./
 
 ENV NODE_ENV=production
 EXPOSE 5000
 CMD ["node", "server.js"]
+
