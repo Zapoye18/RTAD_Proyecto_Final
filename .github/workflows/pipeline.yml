@@ -60,10 +60,16 @@ jobs:
 
             cd RDAT 
 
-            #Build & Up
-            docker compose down
+            docker compose down || true
+            sudo ss -ltnp | grep -E ':80|:8000|:3000' || true
+
             docker compose build --pull --no-cache
             docker compose up -d --force-recreate --remove-orphans
+
+            #Build & Up
+            docker compose ps
+            docker logs refugio-backend --tail=100 || true
+            docker logs refugio-frontend --tail=100 || true
 
             echo "Despliegue OK Definitivo"
 
