@@ -1,20 +1,12 @@
-# Etapa deps
-FROM node:18-alpine AS deps
-WORKDIR /RDAT/backend
-COPY backend/package*.json ./
+FROM node:18
 
-# Herramientas de build para deps nativas (gyp)
-RUN apk add --no-cache --virtual .gyp python3 make g++ \
- && npm ci --omit=dev --no-audit --no-fund --loglevel verbose \
- && apk del .gyp
+WORKDIR /RDAT
 
-# Etapa final
-FROM node:18-alpine
-WORKDIR /RDAT/backend
-COPY --from=deps /RDAT/backend/node_modules ./node_modules
-COPY backend/ ./
+COPY package*.json ./
+RUN npm install --production
 
-ENV NODE_ENV=production
+COPY . .
+
 EXPOSE 5000
-CMD ["node", "server.js"]
 
+CMD ["node", "server.js"]
