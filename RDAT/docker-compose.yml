@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   backend:
-    build: ./backend
+    image: tuusuario/refugio-backend:latest
     container_name: refugio-backend
     environment:
       - NODE_ENV=production
@@ -11,7 +11,7 @@ services:
     restart: always
 
   frontend:
-    build: ./frontend
+    image: tuusuario/refugio-frontend:latest
     container_name: refugio-frontend
     ports:
       - "80:80"
