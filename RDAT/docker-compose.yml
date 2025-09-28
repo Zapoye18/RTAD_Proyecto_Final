@@ -3,9 +3,7 @@ services:
   backend:
     image: zapoye18/refugio-backend:latest
     container_name: refugio-backend
-    environment:
-      - NODE_ENV=production
-      - PORT=5000
+    env_file: .env
     ports:
       - "5000:5000"
     restart: always
