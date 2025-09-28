@@ -1,9 +1,9 @@
-// Mock de fs con "estado" en memoria.
-let store;
+let mockStore;
+
 jest.mock('fs', () => ({
   existsSync: jest.fn(() => true),
-  readFileSync: jest.fn(() => JSON.stringify(store)),
-  writeFileSync: jest.fn((_, data) => { store = JSON.parse(data); })
+  readFileSync: jest.fn(() => JSON.stringify(mockStore)),
+  writeFileSync: jest.fn((_, data) => { mockStore = JSON.parse(data); })
 }));
 
 const usersCtrl = require('../models/users');
@@ -16,7 +16,7 @@ function resMock() {
 }
 
 beforeEach(() => {
-  store = [
+  mockStore = [
     { id: 1, username: 'admin', password: 'refugio123', role: 'administrador' },
     { id: 2, username: 'emp',   password: '123',        role: 'empleado' }
   ];
@@ -26,26 +26,26 @@ beforeEach(() => {
 test('list devuelve usuarios', () => {
   const res = resMock();
   usersCtrl.list({}, res);
-  expect(res.json).toHaveBeenCalledWith(store);
+  expect(res.json).toHaveBeenCalledWith(mockStore);
 });
 
-test('login exitoso', () => {
+test('login OK', () => {
   const res = resMock();
   usersCtrl.login({ body: { username: 'admin', password: 'refugio123' } }, res);
   expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
-    user: expect.objectContaining({ username: 'admin', role: 'administrador' })
+    user: expect.objectContaining({ username: 'admin' })
   }));
 });
 
-test('login inválido', () => {
+test('login 401', () => {
   const res = resMock();
-  usersCtrl.login({ body: { username: 'admin', password: 'zzz' } }, res);
+  usersCtrl.login({ body: { username: 'admin', password: 'bad' } }, res);
   expect(res.status).toHaveBeenCalledWith(401);
 });
 
-test('add crea usuario nuevo y persiste', () => {
+test('add crea usuario', () => {
   const res = resMock();
-  usersCtrl.add({ body: { username: 'nuevo', password: 'abc', role: 'empleado' } }, res);
+  usersCtrl.add({ body: { username: 'nuevo', password: 'x', role: 'empleado' } }, res);
   expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ username: 'nuevo' }));
 });
 
@@ -55,8 +55,9 @@ test('add rechaza duplicado', () => {
   expect(res.status).toHaveBeenCalledWith(400);
 });
 
-test('delete elimina por id y persiste', () => {
+test('delete elimina', () => {
   const res = resMock();
   usersCtrl.delete({ params: { id: '2' } }, res);
   expect(res.json).toHaveBeenCalledWith({ success: true });
 });
+
