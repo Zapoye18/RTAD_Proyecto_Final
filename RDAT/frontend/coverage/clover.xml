@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1759024789997" clover="3.2.0">
+  <project timestamp="1759024789997" name="All files">
+    <metrics statements="21" coveredstatements="1" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0" elements="37" coveredelements="1" complexity="0" loc="21" ncloc="21" packages="1" files="1" classes="1"/>
+    <file name="app.js" path="C:\Users\jorda\RTAD_Proyecto_Final\RDAT\frontend\app.js">
+      <metrics statements="21" coveredstatements="1" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0"/>
+      <line num="1" count="2" type="stmt"/>
+      <line num="2" count="0" type="stmt"/>
+      <line num="3" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="4" count="0" type="stmt"/>
+      <line num="5" count="0" type="stmt"/>
+      <line num="6" count="0" type="stmt"/>
+      <line num="7" count="0" type="stmt"/>
+      <line num="9" count="0" type="cond" truecount="0" falsecount="4"/>
+      <line num="10" count="0" type="stmt"/>
+      <line num="11" count="0" type="stmt"/>
+      <line num="15" count="0" type="stmt"/>
+      <line num="16" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="17" count="0" type="stmt"/>
+      <line num="20" count="0" type="stmt"/>
+      <line num="24" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="26" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="27" count="0" type="stmt"/>
+      <line num="28" count="0" type="stmt"/>
+      <line num="29" count="0" type="stmt"/>
+      <line num="30" count="0" type="stmt"/>
+      <line num="33" count="0" type="stmt"/>
+    </file>
+  </project>
+</coverage>
