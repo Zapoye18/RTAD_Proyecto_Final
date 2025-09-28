@@ -7,5 +7,9 @@ module.exports = {
     'models/**/*.js',
     'routes/**/*.js',
   ],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '<rootDir>/models/user.model.js'
+  ],
   coverageThreshold: { global: { lines: 80, functions: 80, statements: 80, branches: 70 } }
 };

@@ -1,33 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1759025632778" clover="3.2.0">
-  <project timestamp="1759025632778" name="All files">
-    <metrics statements="53" coveredstatements="38" conditionals="14" coveredconditionals="8" methods="11" coveredmethods="9" elements="78" coveredelements="55" complexity="0" loc="53" ncloc="53" packages="3" files="4" classes="4"/>
+<coverage generated="1759032513591" clover="3.2.0">
+  <project timestamp="1759032513591" name="All files">
+    <metrics statements="50" coveredstatements="50" conditionals="14" coveredconditionals="12" methods="11" coveredmethods="11" elements="75" coveredelements="73" complexity="0" loc="50" ncloc="50" packages="3" files="3" classes="3"/>
     <package name="controllers">
-      <metrics statements="12" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <metrics statements="12" coveredstatements="12" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
       <file name="auth.controller.js" path="C:\Users\jorda\RTAD_Proyecto_Final\RDAT\backend\controllers\auth.controller.js">
-        <metrics statements="12" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="2" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="13" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="15" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
+        <metrics statements="12" coveredstatements="12" conditionals="4" coveredconditionals="4" methods="2" coveredmethods="2"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="3" type="stmt"/>
+        <line num="7" count="3" type="stmt"/>
+        <line num="9" count="3" type="stmt"/>
+        <line num="10" count="3" type="stmt"/>
+        <line num="13" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="15" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="22" count="1" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
       </file>
     </package>
     <package name="models">
-      <metrics statements="33" coveredstatements="30" conditionals="10" coveredconditionals="8" methods="9" coveredmethods="9"/>
-      <file name="user.model.js" path="C:\Users\jorda\RTAD_Proyecto_Final\RDAT\backend\models\user.model.js">
-        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-      </file>
+      <metrics statements="30" coveredstatements="30" conditionals="10" coveredconditionals="8" methods="9" coveredmethods="9"/>
       <file name="users.js" path="C:\Users\jorda\RTAD_Proyecto_Final\RDAT\backend\models\users.js">
         <metrics statements="30" coveredstatements="30" conditionals="10" coveredconditionals="8" methods="9" coveredmethods="9"/>
         <line num="1" count="2" type="stmt"/>

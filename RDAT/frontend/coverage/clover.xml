@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1759024789997" clover="3.2.0">
-  <project timestamp="1759024789997" name="All files">
+<coverage generated="1759032553097" clover="3.2.0">
+  <project timestamp="1759032553097" name="All files">
     <metrics statements="21" coveredstatements="1" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0" elements="37" coveredelements="1" complexity="0" loc="21" ncloc="21" packages="1" files="1" classes="1"/>
     <file name="app.js" path="C:\Users\jorda\RTAD_Proyecto_Final\RDAT\frontend\app.js">
       <metrics statements="21" coveredstatements="1" conditionals="12" coveredconditionals="0" methods="4" coveredmethods="0"/>
