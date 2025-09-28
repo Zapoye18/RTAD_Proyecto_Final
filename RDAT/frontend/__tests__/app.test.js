@@ -64,15 +64,14 @@ test('faltan campos muestra mensaje de validación', () => {
     .toMatch(/por favor|completa todos/i);
 });
 test('redirige a loggedpageemp.html tras login OK', () => {
-  jest.useFakeTimers(); // 👈 importante para cubrir la callback del setTimeout
+  jest.useFakeTimers();
 
+  // Hook para capturar la redirección
+  window.__onRedirect = jest.fn();
+
+  // Carga el script y dispara DOMContentLoaded
   require('../app.js');
   document.dispatchEvent(new Event('DOMContentLoaded'));
-
-  // Hacemos window.location asignable en JSDOM
-  const originalLocation = window.location;
-  delete window.location;
-  window.location = { href: 'http://localhost/' };
 
   // Login válido
   document.getElementById('username').value = 'admin';
@@ -80,13 +79,17 @@ test('redirige a loggedpageemp.html tras login OK', () => {
   document.getElementById('loginForm')
     .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 
-  // Avanza el temporizador de 1s
+  // Ejecuta el timeout de 1s
   jest.advanceTimersByTime(1000);
 
-  // Verifica el redirect
-  expect(window.location.href).toMatch(/loggedpageemp\.html$/);
+  // Se intentó redirigir correctamente
+  expect(window.__onRedirect).toHaveBeenCalledWith('loggedpageemp.html');
 
   // Limpieza
-  window.location = originalLocation;
+  delete window.__onRedirect;
+  jest.useRealTimers();
 });
+
+
+
 

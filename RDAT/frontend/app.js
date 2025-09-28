@@ -27,7 +27,14 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('usuarioLogueado', JSON.stringify(usuario));
         document.getElementById('mensaje').textContent = `Bienvenido ${usuario.username} (${usuario.role}) ✅`;
         setTimeout(() => {
-          window.location.href = 'loggedpageemp.html';
+          // Hook para tests: si existe, lo usamos y evitamos navegar en jsdom
+          if (typeof window.__onRedirect === 'function') {
+            window.__onRedirect('loggedpageemp.html');
+          } else if (window?.location?.assign) {
+            window.location.assign('loggedpageemp.html');
+          } else {
+            window.location.href = 'loggedpageemp.html';
+          }
         }, 1000);
       } else {
         document.getElementById('mensaje').textContent = 'Usuario o contraseña incorrectos ❌';
