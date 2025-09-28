@@ -1,9 +1,17 @@
 name: CI/CD Refugio Animales (Docker Hub + EC2)
 
 on:
+  pull_request:
+    branches: [ main ]         
+    paths:
+      - 'RDAT/**'
+      - '.github/workflows/**'
   push:
-    branches:
-      - Pruebas2.0
+    branches: [ main ]         
+    paths:
+      - 'RDAT/**'
+      - '.github/workflows/**'
+  workflow_dispatch: 
 
 concurrency:
   group: cicd-refugio-${{ github.ref }}
