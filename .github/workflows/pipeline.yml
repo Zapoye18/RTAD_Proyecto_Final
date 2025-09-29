@@ -2,12 +2,12 @@ name: CI/CD Refugio Animales (Docker Hub + EC2)
 
 on:
   pull_request:
-    branches: [ main ]         
+    branches: [ Pruebas2.0 ]         
     paths:
       - 'RDAT/**'
       - '.github/workflows/**'
   push:
-    branches: [ main ]         
+    branches: [ Pruebas2.0 ]         
     paths:
       - 'RDAT/**'
       - '.github/workflows/**'
