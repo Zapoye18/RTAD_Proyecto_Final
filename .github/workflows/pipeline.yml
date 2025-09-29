@@ -41,7 +41,9 @@ jobs:
         run: npm install
       - name: Test frontend
         working-directory: RDAT/frontend
-        run: npm test -- --coverage
+        run: |
+          chmod +x node_modules/.bin/jest
+          npm test -- --coverage
 
   build-and-push:
     needs: test
