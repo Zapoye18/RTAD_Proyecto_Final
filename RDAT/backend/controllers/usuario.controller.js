@@ -23,8 +23,8 @@ exports.login = async (req, res) => {
     console.error('Error en login:', error);
     // Fallback: usuarios por defecto si no hay DB
     const usuariosDefault = [
-      { id: 1, username: "admin", password: "112233", role: "admin" },
-      { id: 2, username: "pepe12", password: "12345", role: "empleado" }
+      { id: 1, username: "admin", password: "112233", role: "Admin" },
+      { id: 2, username: "pepe12", password: "12345", role: "Empleado" }
     ];
     
     const usuario = usuariosDefault.find(u => u.username === username && u.password === password);
