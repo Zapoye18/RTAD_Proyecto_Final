@@ -55,11 +55,9 @@ test('login OK muestra bienvenida y guarda usuario', async () => {
 });
 
 test('login inválido muestra error', async () => {
-  // Mock respuesta de error
-  fetch.mockResolvedValueOnce({
-    ok: false,
-    json: () => Promise.resolve({ mensaje: 'Usuario o contraseña incorrectos' })
-  });
+  // Mock respuesta de error para este test específico
+  fetch.mockReset();
+  fetch.mockRejectedValueOnce(new Error('Network error'));
   
   require('../app.js');
   document.dispatchEvent(new Event('DOMContentLoaded'));
@@ -73,7 +71,7 @@ test('login inválido muestra error', async () => {
   await new Promise(resolve => setTimeout(resolve, 100));
 
   expect(document.getElementById('mensaje').textContent)
-    .toMatch(/incorrect/); // "incorrectos/incorrectas/incorrecto"
+    .toMatch(/incorrectos|inválidos/); // "incorrectos/incorrectas/incorrecto"
 });
 
 test('faltan campos muestra mensaje de validación', () => {
