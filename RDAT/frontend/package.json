@@ -2,7 +2,7 @@
   "name": "refugio-frontend",
   "version": "1.0.0",
   "scripts": {
-    "test": "jest"
+    "test": "npx jest"
   },
   "devDependencies": {
     "jest": "^29.0.0",
