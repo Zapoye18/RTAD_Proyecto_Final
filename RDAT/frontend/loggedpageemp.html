@@ -52,7 +52,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
   const usuario = JSON.parse(localStorage.getItem('usuarioLogueado'));
-  if (usuario && usuario.role === 'admin') {
+  if (usuario && (usuario.role === 'admin' || usuario.role === 'Admin')) {
     const btn = document.createElement('button');
     btn.textContent = 'Administrador de Usuarios';
     btn.onclick = function() {
