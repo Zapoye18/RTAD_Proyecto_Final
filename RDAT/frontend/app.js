@@ -31,27 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
           document.getElementById('mensaje').textContent = data.mensaje || 'Usuario o contraseña incorrectos';
         }
       } catch (err) {
-        // Fallback: usar localStorage si no hay servidor
-        let usuarios = JSON.parse(localStorage.getItem('usuarios'));
-        if (!usuarios) {
-          usuarios = [
-            { id: 1, username: "admin", password: "112233", role: "admin" },
-            { id: 2, username: "pepe12", password: "12345", role: "empleado" }
-          ];
-          localStorage.setItem('usuarios', JSON.stringify(usuarios));
-        }
-        
-        const usuario = usuarios.find(u => u.username === username && u.password === password);
-        
-        if (usuario) {
-          localStorage.setItem('usuarioLogueado', JSON.stringify(usuario));
-          document.getElementById('mensaje').textContent = `Bienvenido ${usuario.username} (${usuario.role}) ✅`;
-          setTimeout(() => {
-            window.location.href = 'loggedpageemp.html';
-          }, 1000);
-        } else {
-          document.getElementById('mensaje').textContent = 'Usuario o contraseña incorrectos ❌';
-        }
+        document.getElementById('mensaje').textContent = 'Error de conexión al servidor';
       }
     });
   }
