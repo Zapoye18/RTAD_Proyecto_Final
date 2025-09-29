@@ -11,5 +11,5 @@ module.exports = {
     '/node_modules/',
     '<rootDir>/models/user.model.js'
   ],
-wait  coverageThreshold: { global: { lines: 70, functions: 70, statements: 70, branches: 40 } }
+  coverageThreshold: { global: { lines: 70, functions: 70, statements: 70, branches: 40 } }
 };
