@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Voluntarios</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .voluntarios-container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+    .voluntario-form { background: #f9f9f9; padding: 20px; margin: 20px 0; border-radius: 8px; }
+    .form-row { display: flex; gap: 15px; margin: 10px 0; }
+    .form-row input, .form-row select, .form-row textarea { flex: 1; padding: 8px; }
+    .btn { padding: 10px 15px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+    .btn-primary { background: #4CAF50; color: white; }
+    .btn-danger { background: #f44336; color: white; }
+    .btn-warning { background: #ff9800; color: white; }
+    .voluntario-card { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 8px; }
+    .estado-activo { color: #4CAF50; font-weight: bold; }
+    .estado-inactivo { color: #666; }
+  </style>
+</head>
+<body>
+  <div class="voluntarios-container">
+    <h2>Gestión de Voluntarios</h2>
+    
+    <div class="voluntario-form">
+      <h3>Registrar Nuevo Voluntario</h3>
+      <form id="voluntarioForm">
+        <div class="form-row">
+          <input type="text" id="nombre" placeholder="Nombre" required>
+          <input type="text" id="apellido" placeholder="Apellido" required>
+          <input type="email" id="email" placeholder="Email" required>
+        </div>
+        <div class="form-row">
+          <input type="tel" id="telefono" placeholder="Teléfono">
+          <input type="text" id="direccion" placeholder="Dirección">
+        </div>
+        <div class="form-row">
+          <select id="disponibilidad" required>
+            <option value="">Disponibilidad</option>
+            <option value="Mañanas">Mañanas</option>
+            <option value="Tardes">Tardes</option>
+            <option value="Fines de semana">Fines de semana</option>
+            <option value="Tiempo completo">Tiempo completo</option>
+          </select>
+          <textarea id="habilidades" placeholder="Habilidades y experiencia"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Registrar Voluntario</button>
+      </form>
+    </div>
+
+    <div id="voluntarios-lista">
+      <h3>Voluntarios Registrados</h3>
+      <div id="voluntarios-container"></div>
+    </div>
+    
+    <p id="mensaje"></p>
+    <button onclick="location.href='loggedpageemp.html'" class="btn">Volver al Menú</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', cargarVoluntarios);
+
+    document.getElementById('voluntarioForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const voluntarioData = {
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        email: document.getElementById('email').value,
+        telefono: document.getElementById('telefono').value,
+        direccion: document.getElementById('direccion').value,
+        disponibilidad: document.getElementById('disponibilidad').value,
+        habilidades: document.getElementById('habilidades').value
+      };
+
+      try {
+        const res = await fetch('http://3.141.131.90:5000/api/voluntarios', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(voluntarioData)
+        });
+
+        if (res.ok) {
+          document.getElementById('mensaje').textContent = 'Voluntario registrado exitosamente';
+          document.getElementById('voluntarioForm').reset();
+          cargarVoluntarios();
+        } else {
+          const error = await res.json();
+          document.getElementById('mensaje').textContent = error.mensaje || 'Error al registrar voluntario';
+        }
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error de conexión';
+      }
+    });
+
+    async function cargarVoluntarios() {
+      try {
+        const res = await fetch('http://3.141.131.90:5000/api/voluntarios');
+        const voluntarios = await res.json();
+
+        const container = document.getElementById('voluntarios-container');
+        container.innerHTML = '';
+
+        voluntarios.forEach(voluntario => {
+          const voluntarioCard = document.createElement('div');
+          voluntarioCard.className = 'voluntario-card';
+          voluntarioCard.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+              <div>
+                <h4>${voluntario.nombre} ${voluntario.apellido}</h4>
+                <p><strong>Email:</strong> ${voluntario.email}</p>
+                <p><strong>Teléfono:</strong> ${voluntario.telefono || 'N/A'}</p>
+                <p><strong>Dirección:</strong> ${voluntario.direccion || 'N/A'}</p>
+                <p><strong>Disponibilidad:</strong> ${voluntario.disponibilidad}</p>
+                <p><strong>Habilidades:</strong> ${voluntario.habilidades || 'N/A'}</p>
+                <p><strong>Fecha registro:</strong> ${new Date(voluntario.fecha_registro).toLocaleDateString()}</p>
+                <p><strong>Estado:</strong> 
+                  <span class="${voluntario.activo ? 'estado-activo' : 'estado-inactivo'}">
+                    ${voluntario.activo ? 'Activo' : 'Inactivo'}
+                  </span>
+                </p>
+              </div>
+              <div>
+                <button onclick="cambiarEstado(${voluntario.id_voluntario}, ${voluntario.activo})" 
+                        class="btn ${voluntario.activo ? 'btn-warning' : 'btn-primary'}">
+                  ${voluntario.activo ? 'Desactivar' : 'Activar'}
+                </button>
+                <button onclick="eliminarVoluntario(${voluntario.id_voluntario})" class="btn btn-danger">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          `;
+          container.appendChild(voluntarioCard);
+        });
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error al cargar voluntarios';
+      }
+    }
+
+    async function cambiarEstado(id, estadoActual) {
+      try {
+        const res = await fetch(`http://3.141.131.90:5000/api/voluntarios/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ activo: estadoActual ? 0 : 1 })
+        });
+
+        if (res.ok) {
+          document.getElementById('mensaje').textContent = 'Estado actualizado correctamente';
+          cargarVoluntarios();
+        } else {
+          document.getElementById('mensaje').textContent = 'Error al actualizar estado';
+        }
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error de conexión';
+      }
+    }
+
+    async function eliminarVoluntario(id) {
+      if (confirm('¿Estás seguro de eliminar este voluntario?')) {
+        try {
+          const res = await fetch(`http://3.141.131.90:5000/api/voluntarios/${id}`, {
+            method: 'DELETE'
+          });
+
+          if (res.ok) {
+            document.getElementById('mensaje').textContent = 'Voluntario eliminado correctamente';
+            cargarVoluntarios();
+          } else {
+            document.getElementById('mensaje').textContent = 'Error al eliminar voluntario';
+          }
+        } catch (error) {
+          document.getElementById('mensaje').textContent = 'Error de conexión';
+        }
+      }
+    }
+  </script>
+</body>
+</html>

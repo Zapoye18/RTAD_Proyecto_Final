@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Inventario</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .inventario-container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+    .inventario-form { background: #f9f9f9; padding: 20px; margin: 20px 0; border-radius: 8px; }
+    .form-row { display: flex; gap: 15px; margin: 10px 0; }
+    .form-row input, .form-row select { flex: 1; padding: 8px; }
+    .btn { padding: 10px 15px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+    .btn-primary { background: #4CAF50; color: white; }
+    .btn-danger { background: #f44336; color: white; }
+    .btn-warning { background: #ff9800; color: white; }
+    .inventario-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .inventario-table th, .inventario-table td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    .inventario-table th { background: #f2f2f2; }
+    .stock-bajo { background-color: #ffebee; }
+    .stock-critico { background-color: #ffcdd2; }
+    .vencimiento-proximo { background-color: #fff3e0; }
+    .vencido { background-color: #ffcdd2; }
+    .solicitud-form { background: #e3f2fd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="inventario-container">
+    <h2>Gestión de Inventario</h2>
+    
+    <!-- Formulario para agregar item -->
+    <div class="inventario-form">
+      <h3>Agregar Item al Inventario</h3>
+      <form id="inventarioForm">
+        <div class="form-row">
+          <input type="text" id="nombre" placeholder="Nombre del producto" required>
+          <select id="tipo_inventario" required>
+            <option value="">Tipo de producto</option>
+            <option value="Alimento">Alimento</option>
+            <option value="Medicamento">Medicamento</option>
+            <option value="Accesorio">Accesorio</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <input type="number" id="cantidad_disponible" placeholder="Cantidad disponible" min="0" required>
+          <input type="number" id="cantidad_solicitada" placeholder="Cantidad solicitada" min="0" value="0">
+        </div>
+        <div class="form-row">
+          <input type="date" id="fecha_ingreso" required>
+          <input type="date" id="fecha_vencimiento" placeholder="Fecha de vencimiento">
+          <select id="disponible">
+            <option value="1">Disponible</option>
+            <option value="0">No disponible</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Agregar al Inventario</button>
+      </form>
+    </div>
+
+    <!-- Filtros -->
+    <div class="inventario-form">
+      <h3>Filtros</h3>
+      <div class="form-row">
+        <select id="filtro-tipo" onchange="cargarInventario()">
+          <option value="">Todos los tipos</option>
+          <option value="Alimento">Alimento</option>
+          <option value="Medicamento">Medicamento</option>
+          <option value="Accesorio">Accesorio</option>
+          <option value="Otro">Otro</option>
+        </select>
+        <select id="filtro-stock" onchange="cargarInventario()">
+          <option value="">Todo el stock</option>
+          <option value="bajo">Stock bajo (< 10)</option>
+          <option value="critico">Stock crítico (< 5)</option>
+          <option value="vencimiento">Próximo a vencer (30 días)</option>
+        </select>
+        <button onclick="cargarInventario()" class="btn btn-primary">Actualizar</button>
+      </div>
+    </div>
+
+    <!-- Tabla de inventario -->
+    <table class="inventario-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Tipo</th>
+          <th>Stock Disponible</th>
+          <th>Solicitado</th>
+          <th>Fecha Ingreso</th>
+          <th>Vencimiento</th>
+          <th>Disponibilidad</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="inventario-tbody">
+      </tbody>
+    </table>
+    
+    <p id="mensaje"></p>
+    <button onclick="location.href='loggedpageemp.html'" class="btn">Volver al Menú</button>
+  </div>
+
+  <!-- Modal para solicitar/reducir stock -->
+  <div id="stockModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:20px; border-radius:8px; min-width:300px;">
+      <h3 id="modalTitle">Gestionar Stock</h3>
+      <div class="form-row">
+        <label>Cantidad:</label>
+        <input type="number" id="modalCantidad" min="1" required>
+      </div>
+      <div class="form-row">
+        <button id="modalConfirmar" class="btn btn-primary">Confirmar</button>
+        <button onclick="cerrarModal()" class="btn">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentItemId = null;
+    let currentAction = null;
+
+    // Cargar inventario al iniciar
+    document.addEventListener('DOMContentLoaded', function() {
+      cargarInventario();
+      
+      // Establecer fecha actual por defecto
+      document.getElementById('fecha_ingreso').value = new Date().toISOString().split('T')[0];
+    });
+
+    // Agregar item al inventario
+    document.getElementById('inventarioForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const itemData = {
+        nombre: document.getElementById('nombre').value,
+        tipo_inventario: document.getElementById('tipo_inventario').value,
+        cantidad_disponible: parseInt(document.getElementById('cantidad_disponible').value),
+        cantidad_solicitada: parseInt(document.getElementById('cantidad_solicitada').value),
+        fecha_ingreso: document.getElementById('fecha_ingreso').value,
+        fecha_vencimiento: document.getElementById('fecha_vencimiento').value || null,
+        disponible: parseInt(document.getElementById('disponible').value)
+      };
+
+      try {
+        const res = await fetch('http://3.141.131.90:5000/api/inventario', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(itemData)
+        });
+
+        if (res.ok) {
+          document.getElementById('mensaje').textContent = 'Item agregado al inventario exitosamente';
+          document.getElementById('inventarioForm').reset();
+          document.getElementById('fecha_ingreso').value = new Date().toISOString().split('T')[0];
+          cargarInventario();
+        } else {
+          const error = await res.json();
+          document.getElementById('mensaje').textContent = error.mensaje || 'Error al agregar item';
+        }
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error de conexión';
+      }
+    });
+
+    // Cargar inventario
+    async function cargarInventario() {
+      try {
+        const res = await fetch('http://3.141.131.90:5000/api/inventario');
+        const inventario = await res.json();
+        
+        // Aplicar filtros
+        const filtroTipo = document.getElementById('filtro-tipo').value;
+        const filtroStock = document.getElementById('filtro-stock').value;
+        
+        let inventarioFiltrado = inventario;
+        
+        if (filtroTipo) {
+          inventarioFiltrado = inventarioFiltrado.filter(item => item.tipo_inventario === filtroTipo);
+        }
+        
+        if (filtroStock === 'bajo') {
+          inventarioFiltrado = inventarioFiltrado.filter(item => item.cantidad_disponible < 10);
+        } else if (filtroStock === 'critico') {
+          inventarioFiltrado = inventarioFiltrado.filter(item => item.cantidad_disponible < 5);
+        } else if (filtroStock === 'vencimiento') {
+          const fechaLimite = new Date();
+          fechaLimite.setDate(fechaLimite.getDate() + 30);
+          inventarioFiltrado = inventarioFiltrado.filter(item => 
+            item.fecha_vencimiento && new Date(item.fecha_vencimiento) <= fechaLimite
+          );
+        }
+
+        const tbody = document.getElementById('inventario-tbody');
+        tbody.innerHTML = '';
+
+        inventarioFiltrado.forEach(item => {
+          const row = document.createElement('tr');
+          
+          // Determinar clase CSS según estado
+          let rowClass = '';
+          let estado = 'Normal';
+          
+          if (item.cantidad_disponible < 5) {
+            rowClass = 'stock-critico';
+            estado = 'Stock Crítico';
+          } else if (item.cantidad_disponible < 10) {
+            rowClass = 'stock-bajo';
+            estado = 'Stock Bajo';
+          }
+          
+          if (item.fecha_vencimiento) {
+            const hoy = new Date();
+            const vencimiento = new Date(item.fecha_vencimiento);
+            const diasParaVencer = Math.ceil((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+            
+            if (diasParaVencer < 0) {
+              rowClass = 'vencido';
+              estado = 'VENCIDO';
+            } else if (diasParaVencer <= 30) {
+              rowClass = 'vencimiento-proximo';
+              estado = `Vence en ${diasParaVencer} días`;
+            }
+          }
+          
+          row.className = rowClass;
+          const disponibilidad = item.disponible ? 'Disponible' : 'No disponible';
+          const disponibilidadClass = item.disponible ? 'estado-disponible' : 'estado-adoptado';
+          
+          row.innerHTML = `
+            <td>${item.nombre}</td>
+            <td>${item.tipo_inventario}</td>
+            <td>${item.cantidad_disponible}</td>
+            <td>${item.cantidad_solicitada}</td>
+            <td>${new Date(item.fecha_ingreso).toLocaleDateString()}</td>
+            <td>${item.fecha_vencimiento ? new Date(item.fecha_vencimiento).toLocaleDateString() : 'N/A'}</td>
+            <td><span class="${disponibilidadClass}">${disponibilidad}</span></td>
+            <td>${estado}</td>
+            <td>
+              <button onclick="cambiarDisponibilidad(${item.id_item}, ${item.disponible})" class="btn ${item.disponible ? 'btn-warning' : 'btn-primary'}">
+                ${item.disponible ? 'Marcar No Disponible' : 'Marcar Disponible'}
+              </button>
+              <button onclick="abrirModal(${item.id_item}, 'solicitar')" class="btn btn-warning">Solicitar</button>
+              <button onclick="abrirModal(${item.id_item}, 'reducir')" class="btn btn-primary">Usar/Reducir</button>
+              <button onclick="eliminarItem(${item.id_item})" class="btn btn-danger">Eliminar</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error al cargar inventario';
+      }
+    }
+
+    // Abrir modal para gestionar stock
+    function abrirModal(itemId, action) {
+      currentItemId = itemId;
+      currentAction = action;
+      
+      const modal = document.getElementById('stockModal');
+      const title = document.getElementById('modalTitle');
+      const confirmar = document.getElementById('modalConfirmar');
+      
+      if (action === 'solicitar') {
+        title.textContent = 'Solicitar Stock';
+        confirmar.textContent = 'Solicitar';
+        confirmar.className = 'btn btn-warning';
+      } else {
+        title.textContent = 'Usar/Reducir Stock';
+        confirmar.textContent = 'Reducir';
+        confirmar.className = 'btn btn-primary';
+      }
+      
+      document.getElementById('modalCantidad').value = '';
+      modal.style.display = 'block';
+    }
+
+    // Cerrar modal
+    function cerrarModal() {
+      document.getElementById('stockModal').style.display = 'none';
+      currentItemId = null;
+      currentAction = null;
+    }
+
+    // Confirmar acción del modal
+    document.getElementById('modalConfirmar').addEventListener('click', async function() {
+      const cantidad = parseInt(document.getElementById('modalCantidad').value);
+      
+      if (!cantidad || cantidad <= 0) {
+        alert('Ingresa una cantidad válida');
+        return;
+      }
+
+      try {
+        const endpoint = currentAction === 'solicitar' ? 'solicitar' : 'usar';
+        const res = await fetch(`http://3.141.131.90:5000/api/inventario/${currentItemId}/${endpoint}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cantidad })
+        });
+
+        if (res.ok) {
+          const action = currentAction === 'solicitar' ? 'solicitado' : 'reducido';
+          document.getElementById('mensaje').textContent = `Stock ${action} correctamente`;
+          cargarInventario();
+          cerrarModal();
+        } else {
+          const error = await res.json();
+          document.getElementById('mensaje').textContent = error.mensaje || 'Error al actualizar stock';
+        }
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error de conexión';
+      }
+    });
+
+    // Cambiar disponibilidad
+    async function cambiarDisponibilidad(id, estadoActual) {
+      try {
+        const res = await fetch(`http://3.141.131.90:5000/api/inventario/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ disponible: estadoActual ? 0 : 1 })
+        });
+
+        if (res.ok) {
+          document.getElementById('mensaje').textContent = 'Disponibilidad actualizada correctamente';
+          cargarInventario();
+        } else {
+          document.getElementById('mensaje').textContent = 'Error al actualizar disponibilidad';
+        }
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error de conexión';
+      }
+    }
+
+    // Eliminar item
+    async function eliminarItem(id) {
+      if (confirm('¿Estás seguro de eliminar este item del inventario?')) {
+        try {
+          const res = await fetch(`http://3.141.131.90:5000/api/inventario/${id}`, {
+            method: 'DELETE'
+          });
+
+          if (res.ok) {
+            document.getElementById('mensaje').textContent = 'Item eliminado correctamente';
+            cargarInventario();
+          } else {
+            document.getElementById('mensaje').textContent = 'Error al eliminar item';
+          }
+        } catch (error) {
+          document.getElementById('mensaje').textContent = 'Error de conexión';
+        }
+      }
+    }
+  </script>
+</body>
+</html>

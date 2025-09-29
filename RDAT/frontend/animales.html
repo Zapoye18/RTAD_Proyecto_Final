@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Animales</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .animales-container { max-width: 1200px; margin: 20px auto; padding: 20px; }
+    .animal-card { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 8px; }
+    .animal-card.prioritario { border-left: 5px solid #ff6b6b; }
+    .animal-form { background: #f9f9f9; padding: 20px; margin: 20px 0; border-radius: 8px; }
+    .form-row { display: flex; gap: 15px; margin: 10px 0; }
+    .form-row input, .form-row select, .form-row textarea { flex: 1; padding: 8px; }
+    .btn { padding: 10px 15px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+    .btn-primary { background: #4CAF50; color: white; }
+    .btn-danger { background: #f44336; color: white; }
+    .btn-warning { background: #ff9800; color: white; }
+    .estado-disponible { color: #4CAF50; font-weight: bold; }
+    .estado-adoptado { color: #666; }
+  </style>
+</head>
+<body>
+  <div class="animales-container">
+    <h2>Gestión de Animales del Refugio</h2>
+    
+    <!-- Formulario para agregar animal -->
+    <div class="animal-form">
+      <h3>Registrar Nuevo Animal</h3>
+      <form id="animalForm">
+        <div class="form-row">
+          <input type="text" id="nombre" placeholder="Nombre del animal" required>
+          <select id="especie" required>
+            <option value="">Seleccionar especie</option>
+            <option value="Perro">Perro</option>
+            <option value="Gato">Gato</option>
+            <option value="Otro">Otro</option>
+          </select>
+          <input type="text" id="raza" placeholder="Raza">
+        </div>
+        <div class="form-row">
+          <input type="number" id="edad" placeholder="Edad (años)" min="0">
+          <select id="sexo">
+            <option value="">Seleccionar sexo</option>
+            <option value="Macho">Macho</option>
+            <option value="Hembra">Hembra</option>
+          </select>
+          <input type="text" id="estado_salud" placeholder="Estado de salud">
+        </div>
+        <div class="form-row">
+          <textarea id="historial_medico" placeholder="Historial médico"></textarea>
+          <textarea id="vacunas" placeholder="Vacunas aplicadas"></textarea>
+        </div>
+        <div class="form-row">
+          <input type="date" id="fecha_ingreso" required>
+          <select id="disponible_adopcion">
+            <option value="1">Disponible para adopción</option>
+            <option value="0">No disponible</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Registrar Animal</button>
+      </form>
+    </div>
+
+    <!-- Lista de animales -->
+    <div id="animales-lista">
+      <h3>Animales Registrados</h3>
+      <div id="animales-container"></div>
+    </div>
+    
+    <p id="mensaje"></p>
+    <button onclick="location.href='loggedpageemp.html'" class="btn">Volver al Menú</button>
+  </div>
+
+  <script>
+    // Cargar animales al iniciar
+    document.addEventListener('DOMContentLoaded', function() {
+      cargarAnimales();
+      
+      // Establecer fecha actual por defecto
+      document.getElementById('fecha_ingreso').value = new Date().toISOString().split('T')[0];
+    });
+
+    // Agregar animal
+    document.getElementById('animalForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const animalData = {
+        nombre: document.getElementById('nombre').value,
+        especie: document.getElementById('especie').value,
+        raza: document.getElementById('raza').value || null,
+        edad: document.getElementById('edad').value || null,
+        sexo: document.getElementById('sexo').value || null,
+        estado_salud: document.getElementById('estado_salud').value || null,
+        historial_medico: document.getElementById('historial_medico').value || null,
+        vacunas: document.getElementById('vacunas').value || null,
+        fecha_ingreso: document.getElementById('fecha_ingreso').value,
+        disponible_adopcion: document.getElementById('disponible_adopcion').value
+      };
+
+      try {
+        const res = await fetch('http://3.141.131.90:5000/api/animales', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(animalData)
+        });
+
+        if (res.ok) {
+          document.getElementById('mensaje').textContent = 'Animal registrado exitosamente';
+          document.getElementById('animalForm').reset();
+          document.getElementById('fecha_ingreso').value = new Date().toISOString().split('T')[0];
+          cargarAnimales();
+        } else {
+          const error = await res.json();
+          document.getElementById('mensaje').textContent = error.mensaje || 'Error al registrar animal';
+        }
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error de conexión';
+      }
+    });
+
+    // Cargar lista de animales
+    async function cargarAnimales() {
+      try {
+        const res = await fetch('http://3.141.131.90:5000/api/animales');
+        const animales = await res.json();
+        
+        // Ordenar por prioridad: disponibles para adopción y más antiguos primero
+        animales.sort((a, b) => {
+          if (a.disponible_adopcion !== b.disponible_adopcion) {
+            return b.disponible_adopcion - a.disponible_adopcion; // Disponibles primero
+          }
+          return new Date(a.fecha_ingreso) - new Date(b.fecha_ingreso); // Más antiguos primero
+        });
+
+        const container = document.getElementById('animales-container');
+        container.innerHTML = '';
+
+        animales.forEach(animal => {
+          const esPrioritario = animal.disponible_adopcion && 
+            new Date() - new Date(animal.fecha_ingreso) > 90 * 24 * 60 * 60 * 1000; // Más de 90 días
+
+          const animalCard = document.createElement('div');
+          animalCard.className = `animal-card ${esPrioritario ? 'prioritario' : ''}`;
+          animalCard.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+              <div>
+                <h4>${animal.nombre} ${esPrioritario ? '⚠️ PRIORITARIO' : ''}</h4>
+                <p><strong>Especie:</strong> ${animal.especie} | <strong>Raza:</strong> ${animal.raza || 'N/A'}</p>
+                <p><strong>Edad:</strong> ${animal.edad || 'N/A'} años | <strong>Sexo:</strong> ${animal.sexo || 'N/A'}</p>
+                <p><strong>Estado de salud:</strong> ${animal.estado_salud || 'N/A'}</p>
+                <p><strong>Fecha de ingreso:</strong> ${new Date(animal.fecha_ingreso).toLocaleDateString()}</p>
+                <p><strong>Estado:</strong> 
+                  <span class="${animal.disponible_adopcion ? 'estado-disponible' : 'estado-adoptado'}">
+                    ${animal.disponible_adopcion ? 'Disponible para adopción' : 'No disponible'}
+                  </span>
+                </p>
+                ${animal.historial_medico ? `<p><strong>Historial:</strong> ${animal.historial_medico}</p>` : ''}
+                ${animal.vacunas ? `<p><strong>Vacunas:</strong> ${animal.vacunas}</p>` : ''}
+              </div>
+              <div>
+                <button onclick="cambiarEstadoAdopcion(${animal.id_animal}, ${animal.disponible_adopcion})" 
+                        class="btn ${animal.disponible_adopcion ? 'btn-warning' : 'btn-primary'}">
+                  ${animal.disponible_adopcion ? 'Marcar como Adoptado' : 'Marcar Disponible'}
+                </button>
+                <button onclick="eliminarAnimal(${animal.id_animal})" class="btn btn-danger">
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          `;
+          container.appendChild(animalCard);
+        });
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error al cargar animales';
+      }
+    }
+
+    // Cambiar estado de adopción
+    async function cambiarEstadoAdopcion(id, estadoActual) {
+      try {
+        const res = await fetch(`http://3.141.131.90:5000/api/animales/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ disponible_adopcion: estadoActual ? 0 : 1 })
+        });
+
+        if (res.ok) {
+          document.getElementById('mensaje').textContent = 'Estado actualizado correctamente';
+          cargarAnimales();
+        } else {
+          document.getElementById('mensaje').textContent = 'Error al actualizar estado';
+        }
+      } catch (error) {
+        document.getElementById('mensaje').textContent = 'Error de conexión';
+      }
+    }
+
+    // Eliminar animal
+    async function eliminarAnimal(id) {
+      if (confirm('¿Estás seguro de eliminar este animal del registro?')) {
+        try {
+          const res = await fetch(`http://3.141.131.90:5000/api/animales/${id}`, {
+            method: 'DELETE'
+          });
+
+          if (res.ok) {
+            document.getElementById('mensaje').textContent = 'Animal eliminado correctamente';
+            cargarAnimales();
+          } else {
+            document.getElementById('mensaje').textContent = 'Error al eliminar animal';
+          }
+        } catch (error) {
+          document.getElementById('mensaje').textContent = 'Error de conexión';
+        }
+      }
+    }
+  </script>
+</body>
+</html>
