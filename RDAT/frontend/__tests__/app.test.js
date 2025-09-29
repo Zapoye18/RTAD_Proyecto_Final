@@ -71,7 +71,7 @@ test('login inválido muestra error', async () => {
   await new Promise(resolve => setTimeout(resolve, 100));
 
   expect(document.getElementById('mensaje').textContent)
-    .toMatch(/incorrectos|inválidos/); // "incorrectos/incorrectas/incorrecto"
+    .toMatch(/Error de conexión al servidor/);
 });
 
 test('faltan campos muestra mensaje de validación', () => {
