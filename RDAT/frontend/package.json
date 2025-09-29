@@ -2,10 +2,11 @@
   "name": "refugio-frontend",
   "version": "1.0.0",
   "scripts": {
-    "test": "npx jest"
+    "test": "node_modules/.bin/jest"
   },
   "devDependencies": {
-    "jest": "^29.0.0",
-    "jest-environment-jsdom": "^29.0.0"
+    "jest": "29.7.0",
+    "jest-environment-jsdom": "29.7.0",
+    "@jest/globals": "29.7.0"
   }
 }
