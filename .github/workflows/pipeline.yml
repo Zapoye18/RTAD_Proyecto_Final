@@ -32,7 +32,7 @@ jobs:
         run: npm install
       - name: Test backend
         working-directory: RDAT/backend
-        run: npx jest --passWithNoTests --coverage
+        run: npm run test:coverage
 
       # Frontend
       - name: Install frontend
@@ -40,7 +40,7 @@ jobs:
         run: npm install
       - name: Test frontend
         working-directory: RDAT/frontend
-        run: npx jest --passWithNoTests --coverage
+        run: npm run test:coverage
 
   build-and-push:
     needs: test
