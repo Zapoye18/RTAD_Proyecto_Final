@@ -35,14 +35,18 @@ beforeEach(() => {
   jest.resetModules(); // para que app.js se ejecute de nuevo en cada test
 });
 
-test('login OK muestra bienvenida y guarda usuario', () => {
-  require('../app.js'); // registra el listener de DOMContentLoaded
-  document.dispatchEvent(new Event('DOMContentLoaded')); // 👈 dispara el init
+test('login OK muestra bienvenida y guarda usuario', async () => {
+  require('../app.js');
+  document.dispatchEvent(new Event('DOMContentLoaded'));
 
   document.getElementById('username').value = 'admin';
   document.getElementById('password').value = '112233';
-  document.getElementById('loginForm')
-    .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  
+  const form = document.getElementById('loginForm');
+  form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  
+  // Esperar a que se procese la promesa
+  await new Promise(resolve => setTimeout(resolve, 100));
 
   expect(document.getElementById('mensaje').textContent)
     .toMatch(/Bienvenido admin/i);
@@ -50,7 +54,13 @@ test('login OK muestra bienvenida y guarda usuario', () => {
     .toBe('admin');
 });
 
-test('login inválido muestra error', () => {
+test('login inválido muestra error', async () => {
+  // Mock respuesta de error
+  fetch.mockResolvedValueOnce({
+    ok: false,
+    json: () => Promise.resolve({ mensaje: 'Usuario o contraseña incorrectos' })
+  });
+  
   require('../app.js');
   document.dispatchEvent(new Event('DOMContentLoaded'));
 
@@ -58,6 +68,9 @@ test('login inválido muestra error', () => {
   document.getElementById('password').value = 'y';
   document.getElementById('loginForm')
     .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+
+  // Esperar a que se procese la promesa
+  await new Promise(resolve => setTimeout(resolve, 100));
 
   expect(document.getElementById('mensaje').textContent)
     .toMatch(/incorrect/); // "incorrectos/incorrectas/incorrecto"
