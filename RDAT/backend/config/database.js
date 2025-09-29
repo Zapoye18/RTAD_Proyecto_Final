@@ -1,19 +1,17 @@
-const mysql = require('mysql2');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
-const connection = mysql.createConnection({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'refugio_tilin',
-  port: process.env.DB_PORT || 3306,
-  ssl: process.env.DB_HOST && process.env.DB_HOST.includes('amazonaws.com') ? 'Amazon RDS' : false,
-  connectTimeout: 60000
+let connection;
+let usingSQLite = true;
+
+console.log('Usando SQLite como base de datos...');
+const dbPath = path.join(__dirname, '..', 'refugio.db');
+connection = new sqlite3.Database(dbPath, (err) => {
+  if (err) {
+    console.error('Error al conectar con SQLite:', err.message);
+  } else {
+    console.log('Conectado a SQLite exitosamente');
+  }
 });
 
-// Manejar errores de conexión
-connection.on('error', (err) => {
-  console.log('Error de MySQL:', err.message);
-  console.log('Usando fallback JSON...');
-});
-
-module.exports = { connection };
+module.exports = { connection, usingSQLite };
