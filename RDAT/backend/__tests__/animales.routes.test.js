@@ -55,6 +55,6 @@ describe('Animales Routes', () => {
       .send(newAnimal);
     
     expect(response.status).toBe(200);
-    expect(response.body.mensaje).toBe('Animal registrado exitosamente');
+    expect(response.body.mensaje).toBe('Animal agregado exitosamente');
   });
 });
