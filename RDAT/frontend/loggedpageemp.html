@@ -52,13 +52,23 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
   const usuario = JSON.parse(localStorage.getItem('usuarioLogueado'));
-  if (usuario && usuario.role === 'administrador') {
+  if (usuario && usuario.role === 'admin') {
     const btn = document.createElement('button');
     btn.textContent = 'Administrador de Usuarios';
     btn.onclick = function() {
-      location.href = 'adminusuarios-local.html';
+      location.href = 'adminusuarios.html';
     };
     document.getElementById('adminBtnContainer').appendChild(btn);
+  }
+  
+  // Mostrar información del usuario logueado
+  if (usuario) {
+    const userInfo = document.createElement('p');
+    userInfo.textContent = `Logueado como: ${usuario.username} (${usuario.role})`;
+    userInfo.style.textAlign = 'center';
+    userInfo.style.marginTop = '20px';
+    userInfo.style.color = '#666';
+    document.querySelector('.emp_menu').appendChild(userInfo);
   }
 });
 </script>

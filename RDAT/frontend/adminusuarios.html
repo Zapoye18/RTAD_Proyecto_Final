@@ -15,7 +15,7 @@
       <input type="password" id="newPassword" placeholder="Contraseña" required>
       <select id="newRole" required>
         <option value="">Rol</option>
-        <option value="administrador">Administrador</option>
+        <option value="admin">Administrador</option>
         <option value="empleado">Empleado</option>
         <option value="veterinario">Veterinario</option>
       </select>
@@ -24,14 +24,14 @@
     <p id="mensaje"></p>
   </div>
   <script>
-    // Solo permite acceso si el usuario logueado es admin
+    // Solo permite acceso si el usuario logueado es Admin
     const usuario = JSON.parse(localStorage.getItem('usuarioLogueado'));
-    if (!usuario || usuario.role !== 'administrador') {
-      document.body.innerHTML = '<h2>Acceso denegado</h2>';
+    if (!usuario || usuario.role !== 'admin') {
+      document.body.innerHTML = '<h2>Acceso denegado - Solo administradores</h2><p>Necesitas permisos de administrador para acceder a esta sección.</p>';
     } else {
       async function fetchUsuarios() {
         try {
-          const res = await fetch('http://localhost:3001/api/usuarios');
+          const res = await fetch('http://localhost:5000/api/usuarios');
           if (!res.ok) throw new Error('Error del servidor');
           return await res.json();
         } catch (error) {
