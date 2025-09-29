@@ -27,7 +27,7 @@ test('login OK muestra bienvenida y guarda usuario', () => {
   document.dispatchEvent(new Event('DOMContentLoaded')); // 👈 dispara el init
 
   document.getElementById('username').value = 'admin';
-  document.getElementById('password').value = 'refugio123';
+  document.getElementById('password').value = '112233';
   document.getElementById('loginForm')
     .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 
@@ -75,7 +75,7 @@ test('redirige a loggedpageemp.html tras login OK', () => {
 
   // Login válido
   document.getElementById('username').value = 'admin';
-  document.getElementById('password').value = 'refugio123';
+  document.getElementById('password').value = '112233';
   document.getElementById('loginForm')
     .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 
