@@ -31,7 +31,7 @@
     } else {
       async function fetchUsuarios() {
         try {
-          const res = await fetch('http://localhost:3001/api/usuarios');
+          const res = await fetch('http://localhost:5000/api/usuarios');
           if (!res.ok) throw new Error('Error del servidor');
           return await res.json();
         } catch (error) {
