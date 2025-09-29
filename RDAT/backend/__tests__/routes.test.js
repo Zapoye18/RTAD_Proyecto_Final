@@ -25,9 +25,9 @@ beforeEach(() => {
 });
 
 test('POST /api/login 200', async () => {
-  const r = await request(makeApp()).post('/api/login').send({ username:'admin', password:'refugio123' });
+  const r = await request(makeApp()).post('/api/login').send({ username:'admin', password:'112233' });
   expect(r.status).toBe(200);
-  expect(r.body.user.username).toBe('admin');
+  expect(r.body.usuario.username).toBe('admin');
 });
 
 test('POST /api/login 401', async () => {
