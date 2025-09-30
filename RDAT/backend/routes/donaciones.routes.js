@@ -4,7 +4,7 @@ const { connection } = require('../config/database');
 
 // Listar donaciones
 router.get('/', (req, res) => {
-  connection.query('SELECT * FROM donaciones ORDER BY fecha_donacion DESC', (err, results) => {
+  connection.query('SELECT * FROM donacion ORDER BY fecha_donacion DESC', (err, results) => {
     if (err) {
       console.error('Error al obtener donaciones:', err);
       return res.status(500).json({ mensaje: 'Error al obtener donaciones' });
@@ -20,7 +20,7 @@ router.post('/', (req, res) => {
   console.log('POST /donaciones - Data received:', { nombre_donante, tipo_donacion });
   
   const query = `
-    INSERT INTO donaciones (nombre_donante, email_donante, telefono_donante, tipo_donacion, monto, forma_pago, descripcion, fecha_donacion) 
+    INSERT INTO donacion (nombre_donante, email_donante, telefono_donante, tipo_donacion, monto, forma_pago, descripcion, fecha_donacion) 
     VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
   `;
   
@@ -41,7 +41,7 @@ router.post('/', (req, res) => {
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
   
-  connection.query('DELETE FROM donaciones WHERE id_donacion = ?', [id], (err, result) => {
+  connection.query('DELETE FROM donacion WHERE id_donacion = ?', [id], (err, result) => {
     if (err) {
       console.error('Error al eliminar donación:', err);
       return res.status(500).json({ mensaje: 'Error al eliminar donación' });

@@ -15,16 +15,16 @@ router.get('/', (req, res) => {
 
 // Agregar nuevo item al inventario
 router.post('/', (req, res) => {
-  const { nombre, tipo_inventario, cantidad_disponible, cantidad_solicitada, fecha_ingreso, fecha_vencimiento, disponible } = req.body;
+  const { nombre, tipo_inventario, cantidad_disponible, cantidad_solicitada, fecha_ingreso, fecha_vencimiento } = req.body;
   
   console.log('POST /inventario - Data received:', { nombre, tipo_inventario });
   
   const query = `
-    INSERT INTO inventario (nombre, tipo_inventario, cantidad_disponible, cantidad_solicitada, fecha_ingreso, fecha_vencimiento, disponible) 
-    VALUES (?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO inventario (nombre, tipo_inventario, cantidad_disponible, cantidad_solicitada, fecha_ingreso, fecha_vencimiento) 
+    VALUES (?, ?, ?, ?, ?, ?)
   `;
   
-  connection.query(query, [nombre, tipo_inventario, cantidad_disponible || 0, cantidad_solicitada || 0, fecha_ingreso, fecha_vencimiento, disponible || 1], (err, result) => {
+  connection.query(query, [nombre, tipo_inventario, cantidad_disponible || 0, cantidad_solicitada || 0, fecha_ingreso, fecha_vencimiento], (err, result) => {
     if (err) {
       console.error('Error al agregar item:', err.code, err.message);
       if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
@@ -90,12 +90,12 @@ router.put('/:id/usar', (req, res) => {
   });
 });
 
-// Actualizar item del inventario (para cambiar disponibilidad)
+// Actualizar item del inventario
 router.put('/:id', (req, res) => {
   const { id } = req.params;
-  const { disponible } = req.body;
+  const { cantidad_disponible, cantidad_solicitada } = req.body;
   
-  connection.query('UPDATE inventario SET disponible = ? WHERE id_item = ?', [disponible, id], (err, result) => {
+  connection.query('UPDATE inventario SET cantidad_disponible = ?, cantidad_solicitada = ? WHERE id_item = ?', [cantidad_disponible, cantidad_solicitada, id], (err, result) => {
     if (err) {
       console.error('Error al actualizar item:', err);
       return res.status(500).json({ mensaje: 'Error al actualizar item' });

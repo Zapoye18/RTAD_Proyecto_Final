@@ -4,7 +4,7 @@ const { connection } = require('../config/database');
 
 // Listar voluntarios
 router.get('/', (req, res) => {
-  connection.query('SELECT * FROM voluntarios ORDER BY fecha_registro DESC', (err, results) => {
+  connection.query('SELECT * FROM voluntario ORDER BY fecha_registro DESC', (err, results) => {
     if (err) {
       console.error('Error al obtener voluntarios:', err);
       return res.status(500).json({ mensaje: 'Error al obtener voluntarios' });
@@ -20,7 +20,7 @@ router.post('/', (req, res) => {
   console.log('POST /voluntarios - Data received:', { nombre, apellido, email });
   
   const query = `
-    INSERT INTO voluntarios (nombre, apellido, email, telefono, direccion, disponibilidad, habilidades, activo, fecha_registro) 
+    INSERT INTO voluntario (nombre, apellido, email, telefono, direccion, disponibilidad, habilidades, activo, fecha_registro) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
   `;
   
@@ -42,7 +42,7 @@ router.put('/:id', (req, res) => {
   const { id } = req.params;
   const { activo } = req.body;
   
-  connection.query('UPDATE voluntarios SET activo = ? WHERE id_voluntario = ?', [activo, id], (err, result) => {
+  connection.query('UPDATE voluntario SET activo = ? WHERE id_voluntario = ?', [activo, id], (err, result) => {
     if (err) {
       console.error('Error al actualizar voluntario:', err);
       return res.status(500).json({ mensaje: 'Error al actualizar voluntario' });
@@ -60,7 +60,7 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const { id } = req.params;
   
-  connection.query('DELETE FROM voluntarios WHERE id_voluntario = ?', [id], (err, result) => {
+  connection.query('DELETE FROM voluntario WHERE id_voluntario = ?', [id], (err, result) => {
     if (err) {
       console.error('Error al eliminar voluntario:', err);
       return res.status(500).json({ mensaje: 'Error al eliminar voluntario' });
