@@ -107,3 +107,31 @@ jobs:
             docker logs refugio-frontend --tail=50 || true
 
             echo "Despliegue completado con Docker Hub"
+
+  zap-baseline:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar carpeta para reportes
+        run: |
+          mkdir -p zap
+          sudo chown -R 1000:1000 zap   
+          sudo chmod -R u+rwX,g+rwX zap
+
+      - name: Ejecutar ZAP Baseline
+        continue-on-error: true
+        run: |
+          docker run --rm \
+            -u 1000:1000 \
+            -v "$PWD/zap:/zap/wrk" ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t "${{ secrets.PUBLIC_APP_URL }}" \
+            -r zap-report.html -x zap-report.xml -J zap-report.json
+
+      - name: Publicar reporte ZAP
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report
+          path: zap/
