@@ -7,13 +7,11 @@ const connection = mysql.createConnection({
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 3306,
   ssl: { rejectUnauthorized: false },
-  connectTimeout: 60000,
-  acquireTimeout: 60000,
-  timeout: 60000
+  connectTimeout: 60000
 });
 
 const usingSQLite = false;
 
-console.log('Connecting to Aurora RDS:', process.env.DB_HOST);
+console.log('Using Aurora RDS only:', process.env.DB_HOST);
 
 module.exports = { connection, usingSQLite };
