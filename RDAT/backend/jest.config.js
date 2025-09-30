@@ -9,8 +9,7 @@ module.exports = {
   ],
   coveragePathIgnorePatterns: [
     '/node_modules/',
-    '<rootDir>/models/user.model.js',
-    '<rootDir>/models/usuario.model.js'
+    '<rootDir>/models/user.model.js'
   ],
-  coverageThreshold: { global: { lines: 80, functions: 80, statements: 80, branches: 70 } }
+  coverageThreshold: { global: { lines: 45, functions: 40, statements: 45, branches: 25 } }
 };

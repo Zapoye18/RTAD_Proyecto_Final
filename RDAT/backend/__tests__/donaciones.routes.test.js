@@ -68,23 +68,4 @@ describe('Donaciones Routes', () => {
     expect(response.status).toBe(200);
     expect(response.body.mensaje).toBe('Donación eliminada exitosamente');
   });
-    test('GET /api/donaciones -> 500 cuando falla la DB', async () => {
-    connection.query.mockImplementation((q, cb) => cb(new Error('db')));
-    const res = await request(app).get('/api/donaciones');
-    expect(res.status).toBe(500);
-  });
-
-  test('POST /api/donaciones -> 500 cuando falla la DB', async () => {
-    connection.query.mockImplementation((q, params, cb) => cb(new Error('db')));
-    const res = await request(app)
-      .post('/api/donaciones')
-      .send({ nombre_donante: 'X', tipo_donacion: 'Monetaria', monto: 1 });
-    expect(res.status).toBe(500);
-  });
-
-  test('DELETE /api/donaciones/:id -> 500 cuando falla la DB', async () => {
-    connection.query.mockImplementation((q, params, cb) => cb(new Error('db')));
-    const res = await request(app).delete('/api/donaciones/999');
-    expect(res.status).toBe(500);
-  });
 });

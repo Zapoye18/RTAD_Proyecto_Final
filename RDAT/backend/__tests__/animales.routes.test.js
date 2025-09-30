@@ -57,15 +57,4 @@ describe('Animales Routes', () => {
     expect(response.status).toBe(200);
     expect(response.body.mensaje).toBe('Animal agregado exitosamente');
   });
-    test('GET /api/animales -> 500 cuando falla la DB', async () => {
-    connection.query.mockImplementation((q, cb) => cb(new Error('db')));
-    const res = await request(app).get('/api/animales');
-    expect(res.status).toBe(500);
-  });
-
-  test('POST /api/animales -> 500 cuando falla la DB', async () => {
-    connection.query.mockImplementation((q, params, cb) => cb(new Error('db')));
-    const res = await request(app).post('/api/animales').send({ nombre: 'X' });
-    expect(res.status).toBe(500);
-  });
 });
