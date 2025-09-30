@@ -163,7 +163,7 @@
           row.innerHTML = `
             <td>${donacion.tipo_donacion}</td>
             <td>$${parseFloat(donacion.monto).toFixed(2)}</td>
-            <td>${new Date(donacion.fecha_donacion).toLocaleDateString()}</td>
+            <td>${new Date(donacion.fecha_donado).toLocaleDateString()}</td>
             <td>${donacion.descripcion || 'N/A'}</td>
             <td>
               <button onclick="eliminarDonacion(${donacion.id_donacion})" class="btn btn-danger">
@@ -184,7 +184,7 @@
       
       const fechaActual = new Date();
       const donacionesMes = donaciones.filter(d => {
-        const fechaDonacion = new Date(d.fecha_donacion);
+        const fechaDonacion = new Date(d.fecha_donado);
         return fechaDonacion.getMonth() === fechaActual.getMonth() && 
                fechaDonacion.getFullYear() === fechaActual.getFullYear();
       }).length;

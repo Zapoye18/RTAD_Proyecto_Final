@@ -4,7 +4,7 @@ const { connection } = require('../config/database');
 
 // Listar donaciones
 router.get('/', (req, res) => {
-  connection.query('SELECT * FROM donacion ORDER BY fecha_donacion DESC', (err, results) => {
+  connection.query('SELECT * FROM donacion ORDER BY fecha_donado DESC', (err, results) => {
     if (err) {
       console.error('Error al obtener donaciones:', err.code, err.message);
       return res.status(500).json({ mensaje: 'Error al obtener donaciones: ' + err.message });
@@ -20,7 +20,7 @@ router.post('/', (req, res) => {
   console.log('POST /donaciones - Data received:', { tipo_donacion, monto });
   
   const query = `
-    INSERT INTO donacion (tipo_donacion, monto, descripcion, fecha_donacion) 
+    INSERT INTO donacion (tipo_donacion, monto, descripcion, fecha_donado) 
     VALUES (?, ?, ?, NOW())
   `;
   
