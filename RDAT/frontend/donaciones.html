@@ -131,8 +131,18 @@
 
     async function cargarDonaciones() {
       try {
+        console.log('Cargando donaciones...');
         const res = await fetch('http://3.141.131.90:5000/api/donaciones');
+        
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error('Error del servidor:', errorData);
+          document.getElementById('mensaje').textContent = 'Error: ' + (errorData.mensaje || 'Error desconocido');
+          return;
+        }
+        
         const donaciones = await res.json();
+        console.log('Donaciones recibidas:', donaciones);
         
         // Aplicar filtros
         const filtroTipo = document.getElementById('filtro-tipo').value;
@@ -174,7 +184,8 @@
           tbody.appendChild(row);
         });
       } catch (error) {
-        document.getElementById('mensaje').textContent = 'Error al cargar donaciones';
+        console.error('Error de conexión:', error);
+        document.getElementById('mensaje').textContent = 'Error de conexión: ' + error.message;
       }
     }
 

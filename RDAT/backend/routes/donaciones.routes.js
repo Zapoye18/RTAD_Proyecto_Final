@@ -4,11 +4,23 @@ const { connection } = require('../config/database');
 
 // Listar donaciones
 router.get('/', (req, res) => {
+  console.log('GET /donaciones - Intentando obtener donaciones...');
+  
   connection.query('SELECT id_donacion, tipo_donacion, descripcion, monto, fecha_donado FROM donacion ORDER BY fecha_donado DESC', (err, results) => {
     if (err) {
-      console.error('Error al obtener donaciones:', err.code, err.message);
-      return res.status(500).json({ mensaje: 'Error al obtener donaciones: ' + err.message });
+      console.error('=== ERROR AL OBTENER DONACIONES ===');
+      console.error('Error code:', err.code);
+      console.error('Error message:', err.message);
+      console.error('SQL State:', err.sqlState);
+      console.error('Error number:', err.errno);
+      return res.status(500).json({ 
+        mensaje: 'Error al obtener donaciones', 
+        error: err.message,
+        code: err.code 
+      });
     }
+    
+    console.log('Donaciones obtenidas exitosamente:', results?.length || 0, 'registros');
     res.json(results || []);
   });
 });
