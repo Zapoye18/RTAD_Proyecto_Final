@@ -17,6 +17,8 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
   const { nombre, apellido, email, telefono, direccion, disponibilidad, habilidades, activo } = req.body;
   
+  console.log('POST /voluntarios - Data received:', { nombre, apellido, email });
+  
   const query = `
     INSERT INTO voluntarios (nombre, apellido, email, telefono, direccion, disponibilidad, habilidades, activo, fecha_registro) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
@@ -24,9 +26,13 @@ router.post('/', (req, res) => {
   
   connection.query(query, [nombre, apellido, email, telefono, direccion, disponibilidad, habilidades, activo || 1], (err, result) => {
     if (err) {
-      console.error('Error al agregar voluntario:', err);
-      return res.status(500).json({ mensaje: 'Error al agregar voluntario' });
+      console.error('Error al agregar voluntario:', err.code, err.message);
+      if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
+        return res.status(500).json({ mensaje: 'Error de conexión a la base de datos. Verifica que RDS esté accesible.' });
+      }
+      return res.status(500).json({ mensaje: 'Error al agregar voluntario: ' + err.message });
     }
+    console.log('Voluntario registrado exitosamente, ID:', result.insertId);
     res.json({ id: result.insertId, mensaje: 'Voluntario registrado exitosamente' });
   });
 });

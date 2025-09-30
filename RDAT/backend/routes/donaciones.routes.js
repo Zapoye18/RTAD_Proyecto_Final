@@ -17,6 +17,8 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
   const { nombre_donante, email_donante, telefono_donante, tipo_donacion, monto, forma_pago, descripcion } = req.body;
   
+  console.log('POST /donaciones - Data received:', { nombre_donante, tipo_donacion });
+  
   const query = `
     INSERT INTO donaciones (nombre_donante, email_donante, telefono_donante, tipo_donacion, monto, forma_pago, descripcion, fecha_donacion) 
     VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
@@ -24,9 +26,13 @@ router.post('/', (req, res) => {
   
   connection.query(query, [nombre_donante, email_donante, telefono_donante, tipo_donacion, monto || 0, forma_pago, descripcion], (err, result) => {
     if (err) {
-      console.error('Error al registrar donación:', err);
-      return res.status(500).json({ mensaje: 'Error al registrar donación' });
+      console.error('Error al registrar donación:', err.code, err.message);
+      if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
+        return res.status(500).json({ mensaje: 'Error de conexión a la base de datos. Verifica que RDS esté accesible.' });
+      }
+      return res.status(500).json({ mensaje: 'Error al registrar donación: ' + err.message });
     }
+    console.log('Donación registrada exitosamente, ID:', result.insertId);
     res.json({ id: result.insertId, mensaje: 'Donación registrada exitosamente' });
   });
 });

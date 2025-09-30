@@ -17,6 +17,8 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
   const { nombre, tipo_inventario, cantidad_disponible, cantidad_solicitada, fecha_ingreso, fecha_vencimiento, disponible } = req.body;
   
+  console.log('POST /inventario - Data received:', { nombre, tipo_inventario });
+  
   const query = `
     INSERT INTO inventario (nombre, tipo_inventario, cantidad_disponible, cantidad_solicitada, fecha_ingreso, fecha_vencimiento, disponible) 
     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -24,9 +26,13 @@ router.post('/', (req, res) => {
   
   connection.query(query, [nombre, tipo_inventario, cantidad_disponible || 0, cantidad_solicitada || 0, fecha_ingreso, fecha_vencimiento, disponible || 1], (err, result) => {
     if (err) {
-      console.error('Error al agregar item:', err);
-      return res.status(500).json({ mensaje: 'Error al agregar item al inventario' });
+      console.error('Error al agregar item:', err.code, err.message);
+      if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
+        return res.status(500).json({ mensaje: 'Error de conexión a la base de datos. Verifica que RDS esté accesible.' });
+      }
+      return res.status(500).json({ mensaje: 'Error al agregar item al inventario: ' + err.message });
     }
+    console.log('Item agregado exitosamente, ID:', result.insertId);
     res.json({ id: result.insertId, mensaje: 'Item agregado al inventario exitosamente' });
   });
 });
