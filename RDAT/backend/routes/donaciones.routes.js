@@ -36,7 +36,7 @@ router.post('/', (req, res) => {
     VALUES (1, ?, ?, ?, NOW())
   `;
   
-  connection.query(query, [tipo_donacion, monto || 0, descripcion], (err, result) => {
+  connection.query(query, [tipo_donacion, descripcion, monto || 0], (err, result) => {
     if (err) {
       console.error('Error al registrar donación:', err.code, err.message);
       if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
