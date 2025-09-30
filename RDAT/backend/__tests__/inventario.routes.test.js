@@ -56,4 +56,17 @@ describe('Inventario Routes', () => {
     expect(response.status).toBe(200);
     expect(response.body.mensaje).toBe('Item agregado al inventario exitosamente');
   });
+    test('GET /api/inventario -> 500 cuando falla la DB', async () => {
+    connection.query.mockImplementation((q, cb) => cb(new Error('db')));
+    const res = await request(app).get('/api/inventario');
+    expect(res.status).toBe(500);
+  });
+
+  test('POST /api/inventario -> 500 cuando falla la DB', async () => {
+    connection.query.mockImplementation((q, params, cb) => cb(new Error('db')));
+    const res = await request(app)
+      .post('/api/inventario')
+      .send({ nombre: 'item' });
+    expect(res.status).toBe(500);
+  });
 });

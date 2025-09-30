@@ -81,4 +81,29 @@ describe('Voluntarios Routes', () => {
     expect(response.status).toBe(200);
     expect(response.body.mensaje).toBe('Voluntario eliminado exitosamente');
   });
+    test('GET /api/voluntarios -> 500 cuando falla la DB', async () => {
+    connection.query.mockImplementation((q, cb) => cb(new Error('db')));
+    const res = await request(app).get('/api/voluntarios');
+    expect(res.status).toBe(500);
+  });
+
+  test('POST /api/voluntarios -> 500 cuando falla la DB', async () => {
+    connection.query.mockImplementation((q, params, cb) => cb(new Error('db')));
+    const res = await request(app)
+      .post('/api/voluntarios')
+      .send({ nombre: 'X', email: 'x@x.com' });
+    expect(res.status).toBe(500);
+  });
+
+  test('PUT /api/voluntarios/:id -> 500 cuando falla la DB', async () => {
+    connection.query.mockImplementation((q, params, cb) => cb(new Error('db')));
+    const res = await request(app).put('/api/voluntarios/1').send({ activo: 0 });
+    expect(res.status).toBe(500);
+  });
+
+  test('DELETE /api/voluntarios/:id -> 500 cuando falla la DB', async () => {
+    connection.query.mockImplementation((q, params, cb) => cb(new Error('db')));
+    const res = await request(app).delete('/api/voluntarios/1');
+    expect(res.status).toBe(500);
+  });
 });
