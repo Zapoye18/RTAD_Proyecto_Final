@@ -21,7 +21,7 @@ exports.login = async (req, res) => {
     return res.status(401).json({ mensaje: "Usuario o contraseña inválidos ❌" });
   } catch (error) {
     console.error('Error en login:', error);
-    res.status(500).json({ mensaje: "Error de conexión a la base de datos" });
+    res.status(500).json({ mensaje: "Error de conexión a la base de datos RDS" });
   }
 };
 
