@@ -109,29 +109,28 @@ jobs:
             echo "Despliegue completado con Docker Hub"
 
   zap-baseline:
-  needs: deploy
-  runs-on: ubuntu-latest
-  steps:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
     - uses: actions/checkout@v4
 
     - name: Preparar carpeta para reportes
       run: |
         mkdir -p zap
-        sudo chmod 777 zap   # asegura escritura desde el contenedor
+        sudo chmod 777 zap   
 
     - name: Ejecutar ZAP Baseline
-      # aunque ZAP devuelva código !=0, no rompas el job para poder subir reportes
       continue-on-error: true
       run: |
         docker run --rm \
-          -u 0:0 \                         # corre como root (escritura asegurada)
+          -u 0:0 \                         
           -v "$PWD/zap:/zap/wrk" \
           ghcr.io/zaproxy/zaproxy:stable \
           zap-baseline.py -t "${{ secrets.PUBLIC_APP_URL }}" \
             -r zap-report.html -x zap-report.xml -J zap-report.json
 
     - name: Publicar reporte ZAP
-      if: always()                          # súbelo aunque el paso anterior falle
+      if: always()                          
       uses: actions/upload-artifact@v4
       with:
         name: zap-report
