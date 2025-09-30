@@ -15,16 +15,16 @@ router.get('/', (req, res) => {
 
 // Agregar voluntario
 router.post('/', (req, res) => {
-  const { nombre, apellido, email, telefono, direccion, disponibilidad, habilidades, activo } = req.body;
+  const { nombre, email, telefono, direccion, disponibilidad, habilidades, activo } = req.body;
   
-  console.log('POST /voluntarios - Data received:', { nombre, apellido, email });
+  console.log('POST /voluntarios - Data received:', { nombre, email });
   
   const query = `
-    INSERT INTO voluntario (nombre, apellido, email, telefono, direccion, disponibilidad, habilidades, activo, fecha_registro) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    INSERT INTO voluntario (nombre, email, telefono, direccion, disponibilidad, habilidades, activo, fecha_registro) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
   `;
   
-  connection.query(query, [nombre, apellido, email, telefono, direccion, disponibilidad, habilidades, activo || 1], (err, result) => {
+  connection.query(query, [nombre, email, telefono, direccion, disponibilidad, habilidades, activo || 1], (err, result) => {
     if (err) {
       console.error('Error al agregar voluntario:', err.code, err.message);
       if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {

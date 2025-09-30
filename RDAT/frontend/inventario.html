@@ -48,10 +48,6 @@
         <div class="form-row">
           <input type="date" id="fecha_ingreso" required>
           <input type="date" id="fecha_vencimiento" placeholder="Fecha de vencimiento">
-          <select id="disponible">
-            <option value="1">Disponible</option>
-            <option value="0">No disponible</option>
-          </select>
         </div>
         <button type="submit" class="btn btn-primary">Agregar al Inventario</button>
       </form>
@@ -88,7 +84,7 @@
           <th>Solicitado</th>
           <th>Fecha Ingreso</th>
           <th>Vencimiento</th>
-          <th>Disponibilidad</th>
+
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
@@ -138,8 +134,7 @@
         cantidad_disponible: parseInt(document.getElementById('cantidad_disponible').value),
         cantidad_solicitada: parseInt(document.getElementById('cantidad_solicitada').value),
         fecha_ingreso: document.getElementById('fecha_ingreso').value,
-        fecha_vencimiento: document.getElementById('fecha_vencimiento').value || null,
-        disponible: parseInt(document.getElementById('disponible').value)
+        fecha_vencimiento: document.getElementById('fecha_vencimiento').value || null
       };
 
       try {
@@ -224,8 +219,7 @@
           }
           
           row.className = rowClass;
-          const disponibilidad = item.disponible ? 'Disponible' : 'No disponible';
-          const disponibilidadClass = item.disponible ? 'estado-disponible' : 'estado-adoptado';
+
           
           row.innerHTML = `
             <td>${item.nombre}</td>
@@ -234,12 +228,10 @@
             <td>${item.cantidad_solicitada}</td>
             <td>${new Date(item.fecha_ingreso).toLocaleDateString()}</td>
             <td>${item.fecha_vencimiento ? new Date(item.fecha_vencimiento).toLocaleDateString() : 'N/A'}</td>
-            <td><span class="${disponibilidadClass}">${disponibilidad}</span></td>
+
             <td>${estado}</td>
             <td>
-              <button onclick="cambiarDisponibilidad(${item.id_item}, ${item.disponible})" class="btn ${item.disponible ? 'btn-warning' : 'btn-primary'}">
-                ${item.disponible ? 'Marcar No Disponible' : 'Marcar Disponible'}
-              </button>
+
               <button onclick="abrirModal(${item.id_item}, 'solicitar')" class="btn btn-warning">Solicitar</button>
               <button onclick="abrirModal(${item.id_item}, 'reducir')" class="btn btn-primary">Usar/Reducir</button>
               <button onclick="eliminarItem(${item.id_item})" class="btn btn-danger">Eliminar</button>
