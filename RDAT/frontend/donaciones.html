@@ -28,8 +28,6 @@
       <h3>Registrar Nueva Donación</h3>
       <form id="donacionForm">
         <div class="form-row">
-          <input type="text" id="nombre_donante" placeholder="Nombre del donante" required>
-          <input type="email" id="email_donante" placeholder="Email del donante">
           <input type="tel" id="telefono_donante" placeholder="Teléfono del donante">
         </div>
         <div class="form-row">
@@ -101,8 +99,7 @@
     <table class="donaciones-table">
       <thead>
         <tr>
-          <th>Donante</th>
-          <th>Contacto</th>
+          <th>Teléfono</th>
           <th>Tipo</th>
           <th>Monto</th>
           <th>Forma de Pago</th>
@@ -126,8 +123,6 @@
       e.preventDefault();
       
       const donacionData = {
-        nombre_donante: document.getElementById('nombre_donante').value,
-        email_donante: document.getElementById('email_donante').value,
         telefono_donante: document.getElementById('telefono_donante').value,
         tipo_donacion: document.getElementById('tipo_donacion').value,
         monto: document.getElementById('monto').value || null,
@@ -189,11 +184,7 @@
           }
           
           row.innerHTML = `
-            <td>${donacion.nombre_donante}</td>
-            <td>
-              ${donacion.email_donante || 'N/A'}<br>
-              ${donacion.telefono_donante || 'N/A'}
-            </td>
+            <td>${donacion.telefono_donante || 'N/A'}</td>
             <td>${donacion.tipo_donacion}</td>
             <td>${donacion.monto ? '$' + parseFloat(donacion.monto).toFixed(2) : 'N/A'}</td>
             <td>${donacion.forma_pago || 'N/A'}</td>

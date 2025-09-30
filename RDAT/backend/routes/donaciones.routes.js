@@ -15,16 +15,16 @@ router.get('/', (req, res) => {
 
 // Agregar donación
 router.post('/', (req, res) => {
-  const { email_donante, telefono_donante, tipo_donacion, monto, forma_pago, descripcion } = req.body;
+  const { telefono_donante, tipo_donacion, monto, forma_pago, descripcion } = req.body;
   
   console.log('POST /donaciones - Data received:', { tipo_donacion, monto });
   
   const query = `
-    INSERT INTO donacion (email_donante, telefono_donante, tipo_donacion, monto, forma_pago, descripcion, fecha_donacion) 
-    VALUES (?, ?, ?, ?, ?, ?, NOW())
+    INSERT INTO donacion (telefono_donante, tipo_donacion, monto, forma_pago, descripcion, fecha_donacion) 
+    VALUES (?, ?, ?, ?, ?, NOW())
   `;
   
-  connection.query(query, [email_donante, telefono_donante, tipo_donacion, monto || 0, forma_pago, descripcion], (err, result) => {
+  connection.query(query, [telefono_donante, tipo_donacion, monto || 0, forma_pago, descripcion], (err, result) => {
     if (err) {
       console.error('Error al registrar donación:', err.code, err.message);
       if (err.code === 'ECONNREFUSED' || err.code === 'ETIMEDOUT') {
