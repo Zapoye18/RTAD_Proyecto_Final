@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "test": "npx jest --passWithNoTests",
-    "test:coverage": "npx jest --coverage --passWithNoTests"
+    "test:coverage": "jest --config jest.config.js --coverage --passWithNoTests"
   },
   "dependencies": {
     "cors": "^2.8.5",
