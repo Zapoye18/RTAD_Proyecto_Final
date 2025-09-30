@@ -28,9 +28,6 @@
       <h3>Registrar Nueva Donación</h3>
       <form id="donacionForm">
         <div class="form-row">
-          <input type="tel" id="telefono_donante" placeholder="Teléfono del donante">
-        </div>
-        <div class="form-row">
           <select id="tipo_donacion" required>
             <option value="">Tipo de donación</option>
             <option value="Monetaria">Monetaria</option>
@@ -39,15 +36,7 @@
             <option value="Accesorios">Accesorios</option>
             <option value="Otro">Otro</option>
           </select>
-          <input type="number" id="monto" placeholder="Monto (si aplica)" min="0" step="0.01">
-          <select id="forma_pago">
-            <option value="">Forma de pago</option>
-            <option value="Efectivo">Efectivo</option>
-            <option value="Transferencia">Transferencia</option>
-            <option value="Tarjeta">Tarjeta</option>
-            <option value="Cheque">Cheque</option>
-            <option value="N/A">N/A</option>
-          </select>
+          <input type="number" id="monto" placeholder="Monto" min="0" step="0.01" required>
         </div>
         <div class="form-row">
           <textarea id="descripcion" placeholder="Descripción de la donación"></textarea>
@@ -99,10 +88,8 @@
     <table class="donaciones-table">
       <thead>
         <tr>
-          <th>Teléfono</th>
           <th>Tipo</th>
           <th>Monto</th>
-          <th>Forma de Pago</th>
           <th>Fecha</th>
           <th>Descripción</th>
           <th>Acciones</th>
@@ -123,10 +110,8 @@
       e.preventDefault();
       
       const donacionData = {
-        telefono_donante: document.getElementById('telefono_donante').value,
         tipo_donacion: document.getElementById('tipo_donacion').value,
-        monto: document.getElementById('monto').value || null,
-        forma_pago: document.getElementById('forma_pago').value,
+        monto: document.getElementById('monto').value || 0,
         descripcion: document.getElementById('descripcion').value
       };
 
@@ -184,10 +169,8 @@
           }
           
           row.innerHTML = `
-            <td>${donacion.telefono_donante || 'N/A'}</td>
             <td>${donacion.tipo_donacion}</td>
-            <td>${donacion.monto ? '$' + parseFloat(donacion.monto).toFixed(2) : 'N/A'}</td>
-            <td>${donacion.forma_pago || 'N/A'}</td>
+            <td>$${parseFloat(donacion.monto).toFixed(2)}</td>
             <td>${new Date(donacion.fecha_donacion).toLocaleDateString()}</td>
             <td>${donacion.descripcion || 'N/A'}</td>
             <td>

@@ -26,23 +26,12 @@
       <h3>Registrar Nuevo Voluntario</h3>
       <form id="voluntarioForm">
         <div class="form-row">
-          <input type="text" id="nombre" placeholder="Nombre" required>
-          <input type="text" id="apellido" placeholder="Apellido" required>
+          <input type="text" id="nombre" placeholder="Nombre completo" required>
           <input type="email" id="email" placeholder="Email" required>
         </div>
         <div class="form-row">
           <input type="tel" id="telefono" placeholder="Teléfono">
-          <input type="text" id="direccion" placeholder="Dirección">
-        </div>
-        <div class="form-row">
-          <select id="disponibilidad" required>
-            <option value="">Disponibilidad</option>
-            <option value="Mañanas">Mañanas</option>
-            <option value="Tardes">Tardes</option>
-            <option value="Fines de semana">Fines de semana</option>
-            <option value="Tiempo completo">Tiempo completo</option>
-          </select>
-          <textarea id="habilidades" placeholder="Habilidades y experiencia"></textarea>
+          <textarea id="actividades_asignadas" placeholder="Actividades asignadas"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Registrar Voluntario</button>
       </form>
@@ -65,12 +54,9 @@
       
       const voluntarioData = {
         nombre: document.getElementById('nombre').value,
-        apellido: document.getElementById('apellido').value,
         email: document.getElementById('email').value,
         telefono: document.getElementById('telefono').value,
-        direccion: document.getElementById('direccion').value,
-        disponibilidad: document.getElementById('disponibilidad').value,
-        habilidades: document.getElementById('habilidades').value
+        actividades_asignadas: document.getElementById('actividades_asignadas').value
       };
 
       try {
@@ -107,18 +93,10 @@
           voluntarioCard.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: start;">
               <div>
-                <h4>${voluntario.nombre} ${voluntario.apellido}</h4>
+                <h4>${voluntario.nombre}</h4>
                 <p><strong>Email:</strong> ${voluntario.email}</p>
                 <p><strong>Teléfono:</strong> ${voluntario.telefono || 'N/A'}</p>
-                <p><strong>Dirección:</strong> ${voluntario.direccion || 'N/A'}</p>
-                <p><strong>Disponibilidad:</strong> ${voluntario.disponibilidad}</p>
-                <p><strong>Habilidades:</strong> ${voluntario.habilidades || 'N/A'}</p>
-                <p><strong>Fecha registro:</strong> ${new Date(voluntario.fecha_registro).toLocaleDateString()}</p>
-                <p><strong>Estado:</strong> 
-                  <span class="${voluntario.activo ? 'estado-activo' : 'estado-inactivo'}">
-                    ${voluntario.activo ? 'Activo' : 'Inactivo'}
-                  </span>
-                </p>
+                <p><strong>Actividades:</strong> ${voluntario.actividades_asignadas || 'N/A'}</p>
               </div>
               <div>
                 <button onclick="cambiarEstado(${voluntario.id_voluntario}, ${voluntario.activo})" 
