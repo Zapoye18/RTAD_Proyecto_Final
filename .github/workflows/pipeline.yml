@@ -2,12 +2,12 @@ name: CI/CD Refugio Animales (Docker Hub + EC2)
 
 on:
   pull_request:
-    branches: [ Pruebas2.0 ]         
+    branches: [ Test3.0 ]         
     paths:
       - 'RDAT/**'
       - '.github/workflows/**'
   push:
-    branches: [ Pruebas2.0 ]         
+    branches: [ Test3.0 ]         
     paths:
       - 'RDAT/**'
       - '.github/workflows/**'
@@ -107,3 +107,20 @@ jobs:
             docker logs refugio-frontend --tail=50 || true
 
             echo "Despliegue completado con Docker Hub"
+
+  zap-baseline:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run ZAP Baseline
+        run: |
+          mkdir -p zap
+          docker run --rm -v "$PWD/zap:/zap/wrk" owasp/zap2docker-stable \
+            zap-baseline.py -t "${{ secrets.PUBLIC_APP_URL }}" \
+            -r zap-report.html -x zap-report.xml -J zap-report.json
+      - name: Publicar reporte ZAP
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-report
+          path: zap/
+    
