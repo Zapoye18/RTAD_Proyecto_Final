@@ -103,10 +103,19 @@
     document.getElementById('donacionForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       
+      const tipoElement = document.getElementById('tipo_donacion');
+      const montoElement = document.getElementById('monto');
+      const descripcionElement = document.getElementById('descripcion');
+      
+      if (!tipoElement || !montoElement || !descripcionElement) {
+        document.getElementById('mensaje').textContent = 'Error: Elementos del formulario no encontrados';
+        return;
+      }
+      
       const donacionData = {
-        tipo_donacion: document.getElementById('tipo_donacion').value,
-        monto: document.getElementById('monto').value || 0,
-        descripcion: document.getElementById('descripcion').value
+        tipo_donacion: tipoElement.value,
+        monto: montoElement.value || 0,
+        descripcion: descripcionElement.value
       };
 
       try {
@@ -145,8 +154,7 @@
         console.log('Donaciones recibidas:', donaciones);
         
         // Aplicar filtros
-        const filtroTipo = document.getElementById('filtro-tipo').value;
-        const filtroFormaPago = document.getElementById('filtro-forma-pago').value;
+        const filtroTipo = document.getElementById('filtro-tipo')?.value || '';
         
         let donacionesFiltradas = donaciones;
         
@@ -166,14 +174,17 @@
           const row = document.createElement('tr');
           
           // Resaltar montos altos
-          if (donacion.monto && donacion.monto >= 1000) {
+          if (donacion.monto && parseFloat(donacion.monto) >= 1000) {
             row.className = 'monto-alto';
           }
           
+          const monto = donacion.monto ? parseFloat(donacion.monto).toFixed(2) : '0.00';
+          const fecha = donacion.fecha_donado ? new Date(donacion.fecha_donado).toLocaleDateString() : 'N/A';
+          
           row.innerHTML = `
-            <td>${donacion.tipo_donacion}</td>
-            <td>$${parseFloat(donacion.monto).toFixed(2)}</td>
-            <td>${new Date(donacion.fecha_donado).toLocaleDateString()}</td>
+            <td>${donacion.tipo_donacion || 'N/A'}</td>
+            <td>$${monto}</td>
+            <td>${fecha}</td>
             <td>${donacion.descripcion || 'N/A'}</td>
             <td>
               <button onclick="eliminarDonacion(${donacion.id_donacion})" class="btn btn-danger">
