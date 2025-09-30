@@ -6,10 +6,10 @@ const { connection } = require('../config/database');
 router.get('/', (req, res) => {
   connection.query('SELECT * FROM donacion ORDER BY fecha_donacion DESC', (err, results) => {
     if (err) {
-      console.error('Error al obtener donaciones:', err);
-      return res.status(500).json({ mensaje: 'Error al obtener donaciones' });
+      console.error('Error al obtener donaciones:', err.code, err.message);
+      return res.status(500).json({ mensaje: 'Error al obtener donaciones: ' + err.message });
     }
-    res.json(results);
+    res.json(results || []);
   });
 });
 

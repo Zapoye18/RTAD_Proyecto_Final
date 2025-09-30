@@ -73,13 +73,7 @@
           <option value="Accesorios">Accesorios</option>
           <option value="Otro">Otro</option>
         </select>
-        <select id="filtro-forma-pago" onchange="cargarDonaciones()">
-          <option value="">Todas las formas</option>
-          <option value="Efectivo">Efectivo</option>
-          <option value="Transferencia">Transferencia</option>
-          <option value="Tarjeta">Tarjeta</option>
-          <option value="Cheque">Cheque</option>
-        </select>
+
         <button onclick="cargarDonaciones()" class="btn btn-primary">Actualizar</button>
       </div>
     </div>
@@ -150,9 +144,7 @@
           donacionesFiltradas = donacionesFiltradas.filter(d => d.tipo_donacion === filtroTipo);
         }
         
-        if (filtroFormaPago) {
-          donacionesFiltradas = donacionesFiltradas.filter(d => d.forma_pago === filtroFormaPago);
-        }
+
 
         // Actualizar estadísticas
         actualizarEstadisticas(donaciones);

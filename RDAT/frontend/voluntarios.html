@@ -99,10 +99,6 @@
                 <p><strong>Actividades:</strong> ${voluntario.actividades_asignadas || 'N/A'}</p>
               </div>
               <div>
-                <button onclick="cambiarEstado(${voluntario.id_voluntario}, ${voluntario.activo})" 
-                        class="btn ${voluntario.activo ? 'btn-warning' : 'btn-primary'}">
-                  ${voluntario.activo ? 'Desactivar' : 'Activar'}
-                </button>
                 <button onclick="eliminarVoluntario(${voluntario.id_voluntario})" class="btn btn-danger">
                   Eliminar
                 </button>

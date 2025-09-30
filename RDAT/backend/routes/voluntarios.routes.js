@@ -4,12 +4,12 @@ const { connection } = require('../config/database');
 
 // Listar voluntarios
 router.get('/', (req, res) => {
-  connection.query('SELECT * FROM voluntario ORDER BY fecha_registro DESC', (err, results) => {
+  connection.query('SELECT * FROM voluntario', (err, results) => {
     if (err) {
-      console.error('Error al obtener voluntarios:', err);
-      return res.status(500).json({ mensaje: 'Error al obtener voluntarios' });
+      console.error('Error al obtener voluntarios:', err.code, err.message);
+      return res.status(500).json({ mensaje: 'Error al obtener voluntarios: ' + err.message });
     }
-    res.json(results);
+    res.json(results || []);
   });
 });
 
@@ -40,9 +40,9 @@ router.post('/', (req, res) => {
 // Actualizar voluntario
 router.put('/:id', (req, res) => {
   const { id } = req.params;
-  const { activo } = req.body;
+  const { actividades_asignadas } = req.body;
   
-  connection.query('UPDATE voluntario SET activo = ? WHERE id_voluntario = ?', [activo, id], (err, result) => {
+  connection.query('UPDATE voluntario SET actividades_asignadas = ? WHERE id_voluntario = ?', [actividades_asignadas, id], (err, result) => {
     if (err) {
       console.error('Error al actualizar voluntario:', err);
       return res.status(500).json({ mensaje: 'Error al actualizar voluntario' });
