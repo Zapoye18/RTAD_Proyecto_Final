@@ -1,28 +1,17 @@
-const { connection, usingSQLite } = require('../config/database');
+const { connection } = require('../config/database');
 
 class Usuario {
   // Login
   static async login(username, password) {
     return new Promise((resolve, reject) => {
-      if (usingSQLite) {
-        connection.get(
-          'SELECT id_usuario, nombre_usuario, rol_usuario FROM usuario WHERE nombre_usuario = ? AND contraseña = ?',
-          [username, password],
-          (err, result) => {
-            if (err) reject(err);
-            else resolve(result || null);
-          }
-        );
-      } else {
-        connection.query(
-          'SELECT id_usuario, nombre_usuario, rol_usuario FROM usuario WHERE nombre_usuario = ? AND contraseña = ?',
-          [username, password],
-          (err, results) => {
-            if (err) reject(err);
-            else resolve(results[0] || null);
-          }
-        );
-      }
+      connection.query(
+        'SELECT id_usuario, nombre_usuario, rol_usuario FROM usuario WHERE nombre_usuario = ? AND contraseña = ?',
+        [username, password],
+        (err, results) => {
+          if (err) reject(err);
+          else resolve(results[0] || null);
+        }
+      );
     });
   }
 
