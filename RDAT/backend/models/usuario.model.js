@@ -1,4 +1,4 @@
-const { connection } = require('../config/database');
+const { connection, usingSQLite } = require('../config/database');
 
 class Usuario {
   // Login
