@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { connection } = require('../config/database');
+const { connection, usingSQLite } = require('../config/database');
 
 // Listar todo el inventario
 router.get('/', (req, res) => {
@@ -17,18 +17,33 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
   const { nombre, tipo_inventario, cantidad_disponible, cantidad_solicitada, fecha_ingreso, fecha_vencimiento, disponible } = req.body;
   
-  const query = `
-    INSERT INTO inventario (nombre, tipo_inventario, cantidad_disponible, cantidad_solicitada, fecha_ingreso, fecha_vencimiento, disponible) 
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
-  
-  connection.query(query, [nombre, tipo_inventario, cantidad_disponible || 0, cantidad_solicitada || 0, fecha_ingreso, fecha_vencimiento, disponible || 1], (err, result) => {
-    if (err) {
-      console.error('Error al agregar item:', err);
-      return res.status(500).json({ mensaje: 'Error al agregar item al inventario' });
-    }
-    res.json({ id: result.insertId, mensaje: 'Item agregado al inventario exitosamente' });
-  });
+  if (usingSQLite) {
+    const query = `
+      INSERT INTO inventario (nombre, tipo_inventario, cantidad_disponible, cantidad_solicitada, fecha_ingreso, fecha_vencimiento, disponible) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    connection.run(query, [nombre, tipo_inventario, cantidad_disponible || 0, cantidad_solicitada || 0, fecha_ingreso, fecha_vencimiento, disponible || 1], function(err) {
+      if (err) {
+        console.error('Error al agregar item:', err);
+        return res.status(500).json({ mensaje: 'Error al agregar item al inventario' });
+      }
+      res.json({ id: this.lastID, mensaje: 'Item agregado al inventario exitosamente' });
+    });
+  } else {
+    const query = `
+      INSERT INTO inventario (nombre, tipo_inventario, cantidad_disponible, cantidad_solicitada, fecha_ingreso, fecha_vencimiento, disponible) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    connection.query(query, [nombre, tipo_inventario, cantidad_disponible || 0, cantidad_solicitada || 0, fecha_ingreso, fecha_vencimiento, disponible || 1], (err, result) => {
+      if (err) {
+        console.error('Error al agregar item:', err);
+        return res.status(500).json({ mensaje: 'Error al agregar item al inventario' });
+      }
+      res.json({ id: result.insertId, mensaje: 'Item agregado al inventario exitosamente' });
+    });
+  }
 });
 
 // Solicitar stock (aumentar cantidad_solicitada)
