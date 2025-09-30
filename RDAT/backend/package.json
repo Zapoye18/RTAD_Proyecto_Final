@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "npx jest --passWithNoTests",
+    "test": "jest --config ./ci.jest.config.cjs",
     "test:coverage": "jest --config jest.config.js --coverage --passWithNoTests"
   },
   "dependencies": {
